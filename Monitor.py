@@ -487,7 +487,30 @@ class Watcher:
 🎯 Ataque:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
 {score_splt[5]} - {stats[i + 1]}\n'''
-                                            # print(f"Stats refinado: \n{stats_p}")
+
+                                        if stats[i] == "BOLA SEGURA":
+                                            stats_p = stats_p + f'''
+⚽️ Bola Segura:\n                                                                         
+{score_splt[0]} - {stats[i - 1]}                                                    
+{score_splt[5]} - {stats[i + 1]}\n'''
+
+                                        if stats[i] == "DEFESAS":
+                                            stats_p = stats_p + f'''
+🥅🎯 Defesas:\n                                                                         
+{score_splt[0]} - {stats[i - 1]}                                                    
+{score_splt[5]} - {stats[i + 1]}\n'''
+
+                                        if stats[i] == "FORAS DE JOGO":
+                                            stats_p = stats_p + f'''
+⛔️⚽️ Impedimentos:\n                                                                         
+{score_splt[0]} - {stats[i - 1]}                                                    
+{score_splt[5]} - {stats[i + 1]}\n'''
+
+                                        if stats[i] == "FALTAS":
+                                            stats_p = stats_p + f'''
+✖️⚽️ Faltas:\n                                                                         
+{score_splt[0]} - {stats[i - 1]}                                                    
+{score_splt[5]} - {stats[i + 1]}\n'''
 
                             print(f"Fatos do jogo:\n {fato_splt}")
                             # print(f"Stats do jogo:\n {stats_p}")

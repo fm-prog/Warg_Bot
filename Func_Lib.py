@@ -78,3 +78,11 @@ async def match(lance, alertas):
 async def is_placar(string):
     reg_exp = r"^\d+[-]\d+\s"
     return re.match(reg_exp, string) is not None
+
+
+async def is_valor(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False

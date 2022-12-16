@@ -3,6 +3,9 @@ import logging
 import asyncio
 import aioschedule
 from telebot.async_telebot import AsyncTeleBot
+
+import Apostador
+import Banca
 import Motor_DicasBet
 from Motor_live import MotorLive
 import Warg
@@ -20,6 +23,7 @@ sch_monitoramento = aioschedule.Scheduler()
 sch_agendar = aioschedule.Scheduler()
 sch_programar = aioschedule.Scheduler()
 sch_supervisor = aioschedule.Scheduler()
+sch_apostador = aioschedule.Scheduler()
 
 
 @bot.message_handler(commands=['drop'])
@@ -153,6 +157,22 @@ async def atualizacao_live(message):
                            parse_mode="HTML")
 
 
+async def atualizacao_apostador(msg):
+    """
+    Função que verifica se há atualizações no Apostador, caso hajam as informam para o usuário!
+    """
+
+    if Apostador.infos:
+        for i in Apostador.infos:
+            print(f"Fila de Atualização: {Apostador.infos}")
+            print(f"Vai atualizar: {i}")
+            await bot.send_chat_action(msg.chat.id, 'typing')
+            await bot.send_message(msg.chat.id, i, parse_mode="HTML")
+            index = Apostador.infos.index(i)
+            del (Apostador.infos[index])
+            print(f"Ainda na fila: {Apostador.infos}")
+
+
 async def atualizacao_lance(msg):
     """
     Função que verifica se há atualizações, caso hajam as informam para o usuário!
@@ -283,9 +303,13 @@ async def responder(mensagem):
         funcao = funcao.replace("/programar ", "")
         funcao = funcao.split(" ")
         sch_programar.every(1).second.do(programar_sch, mensagem=mensagem, time=funcao[0], hora=funcao[1])
-        await bot.reply_to(mensagem, f"<b>⚠️ Pronto! Às {funcao[1]} vou procurar o jogo do(e)(a) {funcao[0]} pra ti!</b>", parse_mode="HTML")
+        await bot.reply_to(mensagem,
+                           f"<b>⚠️ Pronto! Às {funcao[1]} vou procurar o jogo do(e)(a) {funcao[0]} pra ti!</b>",
+                           parse_mode="HTML")
     else:
-        await bot.reply_to(mensagem, "<b>⚠️ Por favor, informe o nome do time, seguido do horário que deseja monitorar!\n\n✅ Exemplo: /programar Bahia 21:00:00</b>", parse_mode="HTML")
+        await bot.reply_to(mensagem,
+                           "<b>⚠️ Por favor, informe o nome do time, seguido do horário que deseja monitorar!\n\n✅ Exemplo: /programar Bahia 21:00:00</b>",
+                           parse_mode="HTML")
         await bot.reply_to(mensagem,
                            "<b>⚠️ Observe algumas regras:\n\n✅ Agendamentos podem ser feitos no mínimo para o próximo minuto!\n\n✅ Preste atenção à limitação do formato: 23:59:59\n\n✅ Agendamentos podem ser feitos somente para o dia atual!</b>",
                            parse_mode="HTML")
@@ -330,6 +354,91 @@ async def responder(mensagem):
         await supervisionar(mensagem)
 
 
+@bot.message_handler(commands=['banca'])
+async def responder(mensagem):
+    """
+    Ativar ou desativa a função de gestão de banca!
+    """
+    if Banca.ativo:
+        Banca.ativo = False
+        await bot.reply_to(mensagem, "<b>❌ Gestão de Banca desativada!</b>", parse_mode="HTML")
+    else:
+        Banca.ativo = True
+        Banca.Bnc = Banca.Gest_Banca(100.00)
+        print(await Banca.Bnc.get_saldo())
+        await bot.reply_to(mensagem, "<b>✅ Gestão de Banca ativada!</b>", parse_mode="HTML")
+        await bot.reply_to(mensagem, "<b>✅ Banca criada com valor standard de 100 reais!</b>", parse_mode="HTML")
+
+
+@bot.message_handler(commands=['set_saldo'])
+async def responder(mensagem):
+    """
+   Setar saldo da banca!
+    """
+    if Banca.ativo:
+        await bot.reply_to(mensagem, "<b>⚠️ Pera que vou adicionar pra ti!</b>", parse_mode="HTML")
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
+        valor = mensagem.text
+        valor = valor.replace("/set_saldo ", "")
+        if await Lib.is_valor(valor):
+            await Banca.Bnc.set_saldo(float(valor))
+            print(await Banca.Bnc.get_saldo())
+            await bot.reply_to(mensagem, f"<b>⚠️ O saldo da banca foi alterado para {valor} reais!</b>",
+                               parse_mode="HTML")
+        else:
+            await bot.reply_to(mensagem,
+                               f"<b>⚠️ Por favor, informe o comando de forma correta, exemplo: /set_saldo 300</b>",
+                               parse_mode="HTML")
+    else:
+        await bot.reply_to(mensagem, "<b>⚠️ Ative primeiro a Gestão de Banca através do comando /banca!</b>",
+                           parse_mode="HTML")
+
+
+@bot.message_handler(commands=['get_saldo'])
+async def responder(mensagem):
+    """
+    Mostra ao usuário o saldo da banca!
+    """
+    if Banca.ativo:
+        await bot.reply_to(mensagem, "<b>⚠️ Pera que vou ver o saldo pra ti!</b>", parse_mode="HTML")
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
+        await bot.reply_to(mensagem, f"<b>⚠️ O saldo da banca é de {await Banca.Bnc.get_saldo()} reais!</b>",
+                           parse_mode="HTML")
+        print(await Banca.Bnc.get_saldo())
+    else:
+        await bot.reply_to(mensagem, "<b>⚠️ Ative primeiro a Gestão de Banca através do comando /banca!</b>",
+                           parse_mode="HTML")
+
+
+@bot.message_handler(commands=['apostador'])
+async def responder(mensagem):
+    """
+    Ativar a função apostador!
+    """
+    if Banca.ativo:
+        apost = sch_apostador.jobs
+        if apost:
+            await bot.send_chat_action(mensagem.chat.id, 'typing')
+            await bot.send_sticker(mensagem.chat.id,
+                                   "CAACAgIAAxkBAAEG20ZjnN-hbxtmo2bLnqSAEbYTvC0UNwACngIAAzigCnbbnChT4sv5LAQ")
+            await bot.reply_to(mensagem, "<b>❌ Função Apostador desativada!</b>", parse_mode="HTML")
+            sch_apostador.clear()
+            Apostador.ativo = False
+            Apostador.infos = []
+        else:
+            await bot.send_chat_action(mensagem.chat.id, 'typing')
+            await bot.send_sticker(mensagem.chat.id,
+                                   "CAACAgIAAxkBAAEG20RjnN6d6qGFm7aIG2bDAoToOirNMwACmwIAAzigCnIiKYAfnhYoLAQ")
+            await bot.reply_to(mensagem, "<b>⚠️ Sucesso, vou gestionar a banca e mandar dicas de apostas pra tú, segue as calls, (ou não) 😂😂😂!</b>",
+                               parse_mode="HTML")
+            Apostador.ativo = True
+            sch_apostador.every(2).seconds.do(atualizacao_apostador, msg=mensagem)
+            await Apostador.monitorar()
+    else:
+        await bot.reply_to(mensagem, "<b>⚠️ Ative primeiro a Gestão de Banca através do comando /banca!</b>",
+                           parse_mode="HTML")
+
+
 async def programar_sch(mensagem, time, hora):
     """
     Função que checa e efetiva a programação!
@@ -342,7 +451,8 @@ async def programar_sch(mensagem, time, hora):
 
         print("Farei a programacão!")
 
-        await bot.reply_to(mensagem, "<b>⚠️ Como programado, vou ver se o jogo já começou na Betano!</b>", parse_mode="HTML")
+        await bot.reply_to(mensagem, "<b>⚠️ Como programado, vou ver se o jogo já começou na Betano!</b>",
+                           parse_mode="HTML")
 
         resposta = await Warg.torcer(time)
 
@@ -396,9 +506,9 @@ async def supervisionar(mensagem):
     print(f"Jobs do supervisor: {supervisor}")
     if not supervisor:
         print(f"Agendei Atualização, Monitoramento e supervisor!")
-        sch_atualizacao.every(3).seconds.do(atualizacao_lance, msg=mensagem)
+        sch_atualizacao.every(2).seconds.do(atualizacao_lance, msg=mensagem)
         sch_monitoramento.every(15).minutes.do(monitoramento, msg=mensagem)
-        sch_supervisor.every(1).seconds.do(check_sch, msg=mensagem)
+        sch_supervisor.every(1).second.do(check_sch, msg=mensagem)
 
 
 async def scheduler():
@@ -412,6 +522,7 @@ async def scheduler():
         await sch_atualizacao.run_pending()
         await sch_monitoramento.run_pending()
         await sch_programar.run_pending()
+        await sch_apostador.run_pending()
         await asyncio.sleep(1)
 
 
