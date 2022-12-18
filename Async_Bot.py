@@ -3,13 +3,13 @@ import logging
 import asyncio
 import aioschedule
 from telebot.async_telebot import AsyncTeleBot
-
 import Apostador
 import Banca
 import Motor_DicasBet
 from Motor_live import MotorLive
 import Warg
 import Func_Lib as Lib
+import Proto_IA as IA
 
 logging.basicConfig(level=logging.DEBUG, filename="Bot.log", format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger('TeleBot')
@@ -260,7 +260,6 @@ async def responder(mensagem):
     """
     Função que chama a função monitoramento!
     """
-
     await monitoramento(mensagem)
 
 
@@ -306,6 +305,7 @@ async def responder(mensagem):
         await bot.reply_to(mensagem,
                            f"<b>⚠️ Pronto! Às {funcao[1]} vou procurar o jogo do(e)(a) {funcao[0]} pra ti!</b>",
                            parse_mode="HTML")
+        print(sch_programar.jobs)
     else:
         await bot.reply_to(mensagem,
                            "<b>⚠️ Por favor, informe o nome do time, seguido do horário que deseja monitorar!\n\n✅ Exemplo: /programar Bahia 21:00:00</b>",
@@ -429,7 +429,8 @@ async def responder(mensagem):
             await bot.send_chat_action(mensagem.chat.id, 'typing')
             await bot.send_sticker(mensagem.chat.id,
                                    "CAACAgIAAxkBAAEG20RjnN6d6qGFm7aIG2bDAoToOirNMwACmwIAAzigCnIiKYAfnhYoLAQ")
-            await bot.reply_to(mensagem, "<b>⚠️ Sucesso, vou gestionar a banca e mandar dicas de apostas pra tú, segue as calls, (ou não) 😂😂😂!</b>",
+            await bot.reply_to(mensagem,
+                               "<b>⚠️ Sucesso, vou gestionar a banca e mandar dicas de apostas pra tú, segue as calls, (ou não) 😂😂😂!</b>",
                                parse_mode="HTML")
             Apostador.ativo = True
             sch_apostador.every(2).seconds.do(atualizacao_apostador, msg=mensagem)
@@ -437,6 +438,20 @@ async def responder(mensagem):
     else:
         await bot.reply_to(mensagem, "<b>⚠️ Ative primeiro a Gestão de Banca através do comando /banca!</b>",
                            parse_mode="HTML")
+
+
+@bot.message_handler(commands=['treinar'])
+async def responder(mensagem):
+    """
+    Função para treinar o Bot!
+    """
+    cmd = mensagem.text
+    cmd = cmd.replace("/treinar ", "")
+    cmd = cmd.split("/")
+    response = await IA.treinar_bot(cmd[0], cmd[1])
+    await bot.send_chat_action(mensagem.chat.id, 'typing')
+    await bot.reply_to(mensagem, response,
+                       parse_mode="HTML")
 
 
 async def programar_sch(mensagem, time, hora):
@@ -450,11 +465,13 @@ async def programar_sch(mensagem, time, hora):
     if hora == time_now:
 
         print("Farei a programacão!")
-
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
         await bot.reply_to(mensagem, "<b>⚠️ Como programado, vou ver se o jogo já começou na Betano!</b>",
                            parse_mode="HTML")
 
         resposta = await Warg.torcer(time)
+
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
 
         if "Foi mal" in resposta:
             await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
@@ -473,7 +490,34 @@ async def programar_sch(mensagem, time, hora):
             await bot.reply_to(mensagem, resposta, parse_mode="HTML")
             await supervisionar(mensagem)
 
+        print(sch_programar.jobs)
+
         return aioschedule.CancelJob
+
+
+@bot.message_handler(func=lambda message: True)
+async def all_pms(message):
+    """
+    Função que recebe todas as mensagens e chama outra no prototipo da IA!
+    """
+    if await Lib.is_comand(message.text):
+        msg = message.text
+        msg = msg.replace("/", "")
+    else:
+        msg = message.text
+
+    response = await IA.intergrade(msg)
+
+    await bot.send_chat_action(message.chat.id, 'typing')
+
+    if "Sucesso!" in response:
+        await bot.send_sticker(message.chat.id,
+                               "CAACAgIAAxkBAAEG35ljntu4N86ipjqCHNj4JRf-HEpG6AACmAIAAzigChdZHAHjHrETLAQ")
+    else:
+        await bot.send_sticker(message.chat.id,
+                               "CAACAgIAAxkBAAEG35tjntxF_qdul6Rp1UcLsYTqWhdwewACmQIAAzigCs3VGh78Q5RNLAQ")
+
+    await bot.reply_to(message, f"<b>{response}</b>", parse_mode="HTML")
 
 
 async def check_sch(msg):

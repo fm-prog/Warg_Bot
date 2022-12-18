@@ -12,7 +12,6 @@ infos = []
 ativo = False
 
 
-
 async def is_placar(string):
     reg_exp = r"\d+"
     return re.match(reg_exp, string)
@@ -237,7 +236,7 @@ async def monitorar():
                                 tempo = score_splt[-5]
 
                                 if await is_placar(score_splt[-2]) and score_splt[-3] == "-":
-                                    print("confirmei e é jogo")
+                                    print("Confirmei e é jogo!")
                                 else:
                                     break
 

@@ -80,6 +80,11 @@ async def is_placar(string):
     return re.match(reg_exp, string) is not None
 
 
+async def is_comand(string):
+    reg_exp = r"^/"
+    return re.match(reg_exp, string) is not None
+
+
 async def is_valor(string):
     try:
         float(string)
