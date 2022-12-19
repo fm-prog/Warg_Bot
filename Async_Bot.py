@@ -3,6 +3,7 @@ import logging
 import asyncio
 import aioschedule
 from telebot.async_telebot import AsyncTeleBot
+from telebot.async_telebot import types
 import Apostador
 import Banca
 import Motor_DicasBet
@@ -10,6 +11,9 @@ from Motor_live import MotorLive
 import Warg
 import Func_Lib as Lib
 import Proto_IA as IA
+import telebot.util
+from telebot.asyncio_handler_backends import State, StatesGroup
+from telebot import asyncio_filters
 
 logging.basicConfig(level=logging.DEBUG, filename="Bot.log", format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger('TeleBot')
@@ -17,6 +21,7 @@ logger.setLevel(logging.DEBUG)
 
 token = '5638118272:AAH4v1fgYs9twpCjCmrMo08FMvT2KMolzWk'
 bot = AsyncTeleBot(token)
+markup = types.ForceReply(selective=False)
 
 sch_atualizacao = aioschedule.Scheduler()
 sch_monitoramento = aioschedule.Scheduler()
@@ -24,6 +29,50 @@ sch_agendar = aioschedule.Scheduler()
 sch_programar = aioschedule.Scheduler()
 sch_supervisor = aioschedule.Scheduler()
 sch_apostador = aioschedule.Scheduler()
+
+
+class MyStates(StatesGroup):
+    program_op1 = State()
+    program_op2 = State()
+    treinar_op1 = State()
+    treinar_op2 = State()
+
+
+@bot.message_handler(commands=['ajuda'])
+async def responder(mensagem):
+    """
+    Função que mostra pro usuário os comandos disponíveis!
+    """
+    texto = f'''
+⚠️ Comandos
+
+🫡 /live - Lista de jogos ao vivo! 
+🫡 /dicas_bet - Dicas de apostas para hoje do site DicasBet!
+🫡 /leve - Ativa ou desativa o modo de economia de memória!
+🫡 /agendar_off - Desativa todos os lembretes de jogos ao vivo!
+🫡 /alive - Verifica se o Bot está Online!
+🫡 /monitorados - Mostra quais jogos estão!
+🫡 /treinar - Comando para treinar o Bot com perguntas e respostas!
+🫡 /programar - Programa a busca de um determinado jogo em uma determinada hora!
+🫡 /cancelar - Cancela a digitação de qualquer opção de um comando!
+🫡 /programar_off - Desmarca todas as programações feitas!
+🫡 /banca - Ativa ou desativa a função Gestão de Banca!
+🫡 /get_saldo - Mostra ao usuário o saldo da banca!
+🫡 /apostador - Ativa a função Apostador!
+🫡 /drop (número) - Função que dropa um observador!
+✅Exemplo: /drop 1
+🫡 /agendar (minutos) - Função que agenda atualizações de jogos online!
+✅Exemplo: /agendar 60
+🫡 /torcer (nome) - Função para monitorar um determinado jogo de um determinado time!
+✅Exemplo: /torcer Bahia
+🫡 /set_saldo (valor) - Função para definir o saldo da Banca!
+✅Exemplo: /set_saldo 100
+'''
+    if len(str(texto)) > 4096:
+        for x in range(0, len(str(texto)), 4096):
+            await bot.send_message(mensagem.chat.id, f"<b>{texto[x:x + 4096]}</b>", parse_mode="HTML")
+    else:
+        await bot.reply_to(mensagem, f"<b>{texto}</b>", parse_mode="HTML")
 
 
 @bot.message_handler(commands=['drop'])
@@ -93,7 +142,6 @@ async def responder(mensagem):
     """
     Função que retorna as dicas do Dicas Bet
     """
-
     await bot.reply_to(mensagem, "Pera que vou ver no Dicas Bet pra ti!")
     await bot.send_chat_action(mensagem.chat.id, 'typing')
     dicas = Motor_DicasBet.dicas_dicasbet()
@@ -130,7 +178,6 @@ async def responder(mensagem):
     """
     Retorna os jogos ao vivo!
     """
-
     await bot.reply_to(mensagem, "<b>Pera que vou ver na Betano pra ti!</b>", parse_mode="HTML")
     await bot.send_chat_action(mensagem.chat.id, 'typing')
     jogos = await MotorLive.mostrar_jogos_live()
@@ -146,7 +193,6 @@ async def atualizacao_live(message):
     """
     Função que atualiza os jogos ao vivo, chamada pela função agendadora!
     """
-
     await bot.send_chat_action(message.chat.id, 'typing')
     jogos = await MotorLive.mostrar_jogos_live()
     for i in jogos:
@@ -159,9 +205,8 @@ async def atualizacao_live(message):
 
 async def atualizacao_apostador(msg):
     """
-    Função que verifica se há atualizações no Apostador, caso hajam as informam para o usuário!
+    Função que verifica se há atualizações no Apostador, caso hajam, as informam para o usuário!
     """
-
     if Apostador.infos:
         for i in Apostador.infos:
             print(f"Fila de Atualização: {Apostador.infos}")
@@ -177,7 +222,6 @@ async def atualizacao_lance(msg):
     """
     Função que verifica se há atualizações, caso hajam as informam para o usuário!
     """
-
     if Warg.infos:
         for i in Warg.infos:
             print(f"Fila de Atualização: {Warg.infos}")
@@ -236,7 +280,6 @@ async def monitoramento(msg):
     """
     Função que retorna os jogos monitorados!
     """
-
     desocup = ""
     await bot.send_message(msg.chat.id, "<b>👁‍🗨 Monitoramento...</b>", parse_mode="HTML")
     for t, i in enumerate(Warg.monitorados):
@@ -268,7 +311,6 @@ async def responder(mensagem):
     """
     Função que cancela todos os agendamentos!
     """
-
     sch_agendar.clear()
     await bot.send_chat_action(mensagem.chat.id, 'typing')
     await bot.reply_to(mensagem, "<b>⚠️ Todo(s) o(s) agendamento(s) for(am) desmarcado(s)!</b>", parse_mode="HTML")
@@ -283,7 +325,7 @@ async def responder(mensagem):
         await bot.reply_to(mensagem, "<b>⚠️ Pera que vou agendar pra ti!</b>", parse_mode="HTML")
         await bot.send_chat_action(mensagem.chat.id, 'typing')
         tempo = mensagem.text
-        tempo = tempo.replace("/agendar ", "")
+        tempo = telebot.util.extract_arguments(tempo)
         sch_agendar.every(int(tempo)).minutes.do(atualizacao_live, id=mensagem)
         await bot.send_chat_action(mensagem.chat.id, 'typing')
         await bot.reply_to(mensagem, f"<b>⚠️ Agendadas atualizações de jogos ao vivo a cada: {tempo} minuto(s)!</b>",
@@ -295,21 +337,53 @@ async def responder(mensagem):
     """
     Função para programar jogos!
     """
+    await bot.set_state(mensagem.from_user.id, MyStates.program_op1, mensagem.chat.id)
+    await bot.send_message(mensagem.chat.id, "<b>⚠️ Certo, me diz qual é o nome de um dos times que vão jogar!</b>",
+                           parse_mode="HTML", reply_markup=markup)
+
+
+@bot.message_handler(state="*", commands=['cancelar'])
+async def any_state(mensagem):
+    """
+    Cancelar qualquer opção
+    """
+    await bot.send_chat_action(mensagem.chat.id, 'typing')
+    await bot.send_message(mensagem.chat.id, "<b>⚠️ Blz, cancelei a digitação da opção!</b>", parse_mode="HTML")
+    await bot.delete_state(mensagem.from_user.id, mensagem.chat.id)
+
+
+@bot.message_handler(state=MyStates.program_op1)
+async def programar_op1(mensagem):
+    """
+        Opção 1 para o programar (time)
+    """
+    await bot.send_chat_action(mensagem.chat.id, 'typing')
+    await bot.send_message(mensagem.chat.id, "<b>⚠️ Agora me diz o horário que tu quer que eu procure esse jogo!</b>",
+                           parse_mode="HTML", reply_markup=markup)
+    await bot.set_state(mensagem.from_user.id, MyStates.program_op2, mensagem.chat.id)
+    async with bot.retrieve_data(mensagem.from_user.id, mensagem.chat.id) as data:
+        data['program_op1'] = mensagem.text
+
+
+@bot.message_handler(state=MyStates.program_op2)
+async def programar_op2(mensagem):
+    """
+        Opção 2 para o programar (Hora)
+    """
     if await Lib.is_programar(mensagem.text):
-        await bot.reply_to(mensagem, "<b>⚠️ Pera que vou programar o monitoramento pra ti!</b>", parse_mode="HTML")
-        await bot.send_chat_action(mensagem.chat.id, 'typing')
-        funcao = mensagem.text
-        funcao = funcao.replace("/programar ", "")
-        funcao = funcao.split(" ")
-        sch_programar.every(1).second.do(programar_sch, mensagem=mensagem, time=funcao[0], hora=funcao[1])
-        await bot.reply_to(mensagem,
-                           f"<b>⚠️ Pronto! Às {funcao[1]} vou procurar o jogo do(e)(a) {funcao[0]} pra ti!</b>",
-                           parse_mode="HTML")
-        print(sch_programar.jobs)
+        async with bot.retrieve_data(mensagem.from_user.id, mensagem.chat.id) as data:
+            sch_programar.every(1).second.do(programar_sch, mensagem=mensagem, time=data['program_op1'],
+                                             hora=mensagem.text)
+            await bot.send_chat_action(mensagem.chat.id, 'typing')
+            await bot.reply_to(mensagem,
+                               f"<b>⚠️ Pronto! Às {mensagem.text} vou procurar o jogo do(e)(a) {data['program_op1']} pra ti!</b>",
+                               parse_mode="HTML")
+            print(sch_programar.jobs)
+        await bot.delete_state(mensagem.from_user.id, mensagem.chat.id)
     else:
         await bot.reply_to(mensagem,
-                           "<b>⚠️ Por favor, informe o nome do time, seguido do horário que deseja monitorar!\n\n✅ Exemplo: /programar Bahia 21:00:00</b>",
-                           parse_mode="HTML")
+                           "<b>⚠️ Por favor, informe corretamente o horário que deseja monitorar!\n\n✅ Exemplo: 21:00:00</b>",
+                           parse_mode="HTML", reply_markup=markup)
         await bot.reply_to(mensagem,
                            "<b>⚠️ Observe algumas regras:\n\n✅ Agendamentos podem ser feitos no mínimo para o próximo minuto!\n\n✅ Preste atenção à limitação do formato: 23:59:59\n\n✅ Agendamentos podem ser feitos somente para o dia atual!</b>",
                            parse_mode="HTML")
@@ -320,7 +394,6 @@ async def responder(mensagem):
     """
     Função que cancela todas as programações!
     """
-
     sch_programar.clear()
     await bot.send_chat_action(mensagem.chat.id, 'typing')
     await bot.reply_to(mensagem, "<b>⚠️ As programações foram desmarcadas!</b>", parse_mode="HTML")
@@ -333,7 +406,7 @@ async def responder(mensagem):
     """
     await bot.reply_to(mensagem, "<b>⚠️ Vou ver se o jogo já começou na Betano!</b>", parse_mode="HTML")
     pesquisa = mensagem.text
-    pesquisa = pesquisa.replace("/torcer ", "")
+    pesquisa = telebot.util.extract_arguments(pesquisa)
     resposta = await Warg.torcer(pesquisa)
 
     if "Foi mal" in resposta:
@@ -350,6 +423,7 @@ async def responder(mensagem):
 
     else:
         resposta = resposta + "\n<b>🏟 Tô de olho nesse jogo, qualquer lance importante te falo!</b>"
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
         await bot.reply_to(mensagem, resposta, parse_mode="HTML")
         await supervisionar(mensagem)
 
@@ -361,11 +435,13 @@ async def responder(mensagem):
     """
     if Banca.ativo:
         Banca.ativo = False
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
         await bot.reply_to(mensagem, "<b>❌ Gestão de Banca desativada!</b>", parse_mode="HTML")
     else:
         Banca.ativo = True
         Banca.Bnc = Banca.Gest_Banca(100.00)
         print(await Banca.Bnc.get_saldo())
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
         await bot.reply_to(mensagem, "<b>✅ Gestão de Banca ativada!</b>", parse_mode="HTML")
         await bot.reply_to(mensagem, "<b>✅ Banca criada com valor standard de 100 reais!</b>", parse_mode="HTML")
 
@@ -373,13 +449,14 @@ async def responder(mensagem):
 @bot.message_handler(commands=['set_saldo'])
 async def responder(mensagem):
     """
-   Setar saldo da banca!
+    Setar saldo da banca!
     """
     if Banca.ativo:
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
         await bot.reply_to(mensagem, "<b>⚠️ Pera que vou adicionar pra ti!</b>", parse_mode="HTML")
         await bot.send_chat_action(mensagem.chat.id, 'typing')
         valor = mensagem.text
-        valor = valor.replace("/set_saldo ", "")
+        valor = telebot.util.extract_arguments(valor)
         if await Lib.is_valor(valor):
             await Banca.Bnc.set_saldo(float(valor))
             print(await Banca.Bnc.get_saldo())
@@ -400,6 +477,7 @@ async def responder(mensagem):
     Mostra ao usuário o saldo da banca!
     """
     if Banca.ativo:
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
         await bot.reply_to(mensagem, "<b>⚠️ Pera que vou ver o saldo pra ti!</b>", parse_mode="HTML")
         await bot.send_chat_action(mensagem.chat.id, 'typing')
         await bot.reply_to(mensagem, f"<b>⚠️ O saldo da banca é de {await Banca.Bnc.get_saldo()} reais!</b>",
@@ -445,13 +523,43 @@ async def responder(mensagem):
     """
     Função para treinar o Bot!
     """
-    cmd = mensagem.text
-    cmd = cmd.replace("/treinar ", "")
-    cmd = cmd.split("/")
-    response = await IA.treinar_bot(cmd[0], cmd[1])
+    await bot.set_state(mensagem.from_user.id, MyStates.treinar_op1, mensagem.chat.id)
+    await bot.send_message(mensagem.chat.id, "<b>⚠️ Certo, me diz o modelo de pergunta do usuário para o bot!</b>",
+                           parse_mode="HTML", reply_markup=markup)
+
+
+@bot.message_handler(state=MyStates.treinar_op1)
+async def responder(mensagem):
+    """
+    Opção 1 para o treinamento (Pergunta do usuário)
+    """
     await bot.send_chat_action(mensagem.chat.id, 'typing')
-    await bot.reply_to(mensagem, response,
-                       parse_mode="HTML")
+    await bot.send_message(mensagem.chat.id, "<b>⚠️ Blz, me diz agora o modelo de resposta do bot para o usuário!</b>",
+                           parse_mode="HTML", reply_markup=markup)
+    await bot.set_state(mensagem.from_user.id, MyStates.treinar_op2, mensagem.chat.id)
+    async with bot.retrieve_data(mensagem.from_user.id, mensagem.chat.id) as data:
+        data['treinar_op1'] = mensagem.text
+
+
+@bot.message_handler(state=MyStates.treinar_op2)
+async def programar_op2(mensagem):
+    """
+        Opção 2 para o treinamento (Resposta do bot)
+    """
+    async with bot.retrieve_data(mensagem.from_user.id, mensagem.chat.id) as data:
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
+        response = await IA.treinar_bot(data['treinar_op1'], mensagem.text)
+
+        if "Sucesso!" in str(response):
+            await bot.send_sticker(mensagem.chat.id,
+                                   "CAACAgIAAxkBAAEG35ljntu4N86ipjqCHNj4JRf-HEpG6AACmAIAAzigChdZHAHjHrETLAQ")
+        else:
+            await bot.send_sticker(mensagem.chat.id,
+                                   "CAACAgIAAxkBAAEG35tjntxF_qdul6Rp1UcLsYTqWhdwewACmQIAAzigCs3VGh78Q5RNLAQ")
+
+        await bot.reply_to(mensagem, response,
+                           parse_mode="HTML")
+    await bot.delete_state(mensagem.from_user.id, mensagem.chat.id)
 
 
 async def programar_sch(mensagem, time, hora):
@@ -510,14 +618,11 @@ async def all_pms(message):
 
     await bot.send_chat_action(message.chat.id, 'typing')
 
-    if "Sucesso!" in response:
-        await bot.send_sticker(message.chat.id,
-                               "CAACAgIAAxkBAAEG35ljntu4N86ipjqCHNj4JRf-HEpG6AACmAIAAzigChdZHAHjHrETLAQ")
+    if len(str(response)) > 4096:
+        for x in range(0, len(str(response)), 4096):
+            await bot.send_message(message.chat.id, f"<b>{response[x:x + 4096]}</b>", parse_mode="HTML")
     else:
-        await bot.send_sticker(message.chat.id,
-                               "CAACAgIAAxkBAAEG35tjntxF_qdul6Rp1UcLsYTqWhdwewACmQIAAzigCs3VGh78Q5RNLAQ")
-
-    await bot.reply_to(message, f"<b>{response}</b>", parse_mode="HTML")
+        await bot.reply_to(message, f"<b>{response}</b>", parse_mode="HTML")
 
 
 async def check_sch(msg):
@@ -568,6 +673,9 @@ async def scheduler():
         await sch_programar.run_pending()
         await sch_apostador.run_pending()
         await asyncio.sleep(1)
+
+
+bot.add_custom_filter(asyncio_filters.StateFilter(bot))
 
 
 async def main():

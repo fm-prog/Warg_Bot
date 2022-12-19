@@ -22,7 +22,13 @@ async def treinar_bot(msg_user, reply):
 
 
 async def intergrade(mensagem):
-    return chatbot.get_response(mensagem)
+    try:
+        return chatbot.get_response(mensagem)
+    except Exception as error:
+        print(f"Deu merda, aqui o que foi: {error.__class__}")
+        print(error)
+        print(format_tb(error.__traceback__))
+        return "❌ Foi mal, deu algum erro!"
 
 
 

@@ -10,7 +10,7 @@ async def is_agendar(string):
 
 
 async def is_programar(string):
-    reg_exp = r"/programar \w+ [0-2][0-9]:[0-5][0-9]:[0-5][0-9]"
+    reg_exp = r"[0-2][0-9]:[0-5][0-9]:[0-5][0-9]"
     result = re.match(reg_exp, string)
     time_now = datetime.datetime.now()
     time_now = time_now.strftime("%X")
