@@ -147,11 +147,12 @@ class Observer_Penal(Observer):
         alertas = ["penalidades", "pênalti", "penalidade"]
         penal = await Lib.match(jogo.alerta.lower(), alertas)
         if penal:
-            jogo.lance = True
-            jogo.penal = True
-            jogo.lista_facts.append(jogo.alerta)
-            logging.info("\nEu vi um pênalti!")
-            print("\nEu vi um pênalti!")
+            if "com pênalti" not in jogo.alerta.lower():
+                jogo.lance = True
+                jogo.penal = True
+                jogo.lista_facts.append(jogo.alerta)
+                logging.info("\nEu vi um pênalti!")
+                print("\nEu vi um pênalti!")
 
 
 class Observer_warg(Observer):

@@ -5,12 +5,20 @@ import logging
 
 
 async def is_agendar(string):
-    reg_exp = r"/agendar \d+"
+    if string.isdigit():
+        reg_exp = r"[1-999]"
+    else:
+        return False
+    return re.match(reg_exp, string)
+
+
+async def is_time(string):
+    reg_exp = r"\w"
     return re.match(reg_exp, string)
 
 
 async def is_programar(string):
-    reg_exp = r"[0-2][0-9]:[0-5][0-9]:[0-5][0-9]"
+    reg_exp = r"^[0-2][0-9]:[0-5][0-9]:[0-5][0-9]$"
     result = re.match(reg_exp, string)
     time_now = datetime.datetime.now()
     time_now = time_now.strftime("%X")
@@ -30,7 +38,7 @@ async def is_programar(string):
 
 
 async def is_drop(string):
-    reg_exp = r"/drop\s[1-5]$"
+    reg_exp = r"^[1-5]$"
     return re.match(reg_exp, string)
 
 

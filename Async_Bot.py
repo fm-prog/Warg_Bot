@@ -61,7 +61,7 @@ async def responder(mensagem):
 🫡 /apostador - Ativa a função Apostador!
 🫡 /drop (número) - Função que dropa um observador!
 ✅Exemplo: /drop 1
-🫡 /agendar (minutos) - Função que agenda atualizações de jogos online!
+🫡 /agendar (minutos) - Função que agenda atualizações de jogos online a cada período determinado!
 ✅Exemplo: /agendar 60
 🫡 /torcer (nome) - Função para monitorar um determinado jogo de um determinado time!
 ✅Exemplo: /torcer Bahia
@@ -81,9 +81,9 @@ async def responder(mensagem):
     Função que dropa um observador!
     """
     await bot.send_chat_action(mensagem.chat.id, 'typing')
-    arg = mensagem.text.split()
-    if len(arg) > 1 and await Lib.is_drop(mensagem.text):
-        match arg[1]:
+    arg = telebot.util.extract_arguments(mensagem.text)
+    if await Lib.is_drop(arg):
+        match arg:
             case "1":
                 if Warg.monitorados[0] != "Stand By":
                     Warg.monitorados[0] = "Close"
@@ -121,7 +121,7 @@ async def responder(mensagem):
                     await bot.reply_to(mensagem, "<b>⛔️ Este observador está desocupado!</b>", parse_mode="HTML")
     else:
         await bot.reply_to(mensagem, "<b>⚠️ Por favor colocar o comando drop, seguido de um número de 1 a "
-                                     "5!\nExemplo: drop 1</b>", parse_mode="HTML")
+                                     "5!\n✅ Exemplo: /drop 1</b>", parse_mode="HTML")
 
 
 @bot.message_handler(commands=['alive'])
@@ -194,6 +194,8 @@ async def atualizacao_live(message):
     Função que atualiza os jogos ao vivo, chamada pela função agendadora!
     """
     await bot.send_chat_action(message.chat.id, 'typing')
+    await bot.reply_to(message, "<b>⚠️ Como agendado, vou listar os jogos online!</b>",
+                       parse_mode="HTML")
     jogos = await MotorLive.mostrar_jogos_live()
     for i in jogos:
         await bot.send_message(message.chat.id, i, parse_mode="HTML")
@@ -321,15 +323,18 @@ async def responder(mensagem):
     """
     Função que agenda atualizacoes!
     """
-    if await Lib.is_agendar(mensagem.text):
+    tempo = mensagem.text
+    tempo = telebot.util.extract_arguments(tempo)
+    if await Lib.is_agendar(tempo):
         await bot.reply_to(mensagem, "<b>⚠️ Pera que vou agendar pra ti!</b>", parse_mode="HTML")
         await bot.send_chat_action(mensagem.chat.id, 'typing')
-        tempo = mensagem.text
-        tempo = telebot.util.extract_arguments(tempo)
-        sch_agendar.every(int(tempo)).minutes.do(atualizacao_live, id=mensagem)
-        await bot.send_chat_action(mensagem.chat.id, 'typing')
+        sch_agendar.every(int(tempo)).minutes.do(atualizacao_live, message=mensagem)
         await bot.reply_to(mensagem, f"<b>⚠️ Agendadas atualizações de jogos ao vivo a cada: {tempo} minuto(s)!</b>",
                            parse_mode="HTML")
+    else:
+        await bot.send_chat_action(mensagem.chat.id, 'typing')
+        await bot.reply_to(mensagem, "<b>⚠️ Por favor colocar o comando /agendar, seguido de um número de 1 a "
+                                     "999!\n✅ Exemplo: /agendar 60</b>", parse_mode="HTML")
 
 
 @bot.message_handler(commands=['programar'])
@@ -404,28 +409,35 @@ async def responder(mensagem):
     """
     Função para monitorar jogos!
     """
+    await bot.send_chat_action(mensagem.chat.id, 'typing')
     await bot.reply_to(mensagem, "<b>⚠️ Vou ver se o jogo já começou na Betano!</b>", parse_mode="HTML")
     pesquisa = mensagem.text
     pesquisa = telebot.util.extract_arguments(pesquisa)
-    resposta = await Warg.torcer(pesquisa)
+    if await Lib.is_time(pesquisa):
 
-    if "Foi mal" in resposta:
-        await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
+        resposta = await Warg.torcer(pesquisa)
 
-    elif "não começou!" in resposta:
-        await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
+        if "Foi mal" in resposta:
+            await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
 
-    elif "já está sendo monitorado!" in resposta:
-        await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
+        elif "não começou!" in resposta:
+            await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
 
-    elif "estão ocupados!" in resposta:
-        await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
+        elif "já está sendo monitorado!" in resposta:
+            await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
 
+        elif "estão ocupados!" in resposta:
+            await bot.reply_to(mensagem, f"⚠️ <b>{resposta}</b>", parse_mode="HTML")
+
+        else:
+            resposta = resposta + "\n<b>🏟 Tô de olho nesse jogo, qualquer lance importante te falo!</b>"
+            await bot.send_chat_action(mensagem.chat.id, 'typing')
+            await bot.reply_to(mensagem, resposta, parse_mode="HTML")
+            await supervisionar(mensagem)
     else:
-        resposta = resposta + "\n<b>🏟 Tô de olho nesse jogo, qualquer lance importante te falo!</b>"
-        await bot.send_chat_action(mensagem.chat.id, 'typing')
-        await bot.reply_to(mensagem, resposta, parse_mode="HTML")
-        await supervisionar(mensagem)
+        await bot.reply_to(mensagem,
+                           "<b>⚠️ Por favor, informe corretamente o nome de um time!\n\n✅ Exemplo: /torcer Bahia</b>",
+                           parse_mode="HTML", reply_markup=markup)
 
 
 @bot.message_handler(commands=['banca'])
@@ -664,7 +676,6 @@ async def scheduler():
     """
     Função que da start nos schedules!
     """
-
     while True:
         await sch_agendar.run_pending()
         await sch_supervisor.run_pending()

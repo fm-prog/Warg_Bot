@@ -66,7 +66,6 @@ class MotorLive:
                                 if await Lib.is_horario(ligas[e][i]):
 
                                     if await Lib.is_prolongamento(ligas[e][i + 1]):
-                                        print("achei")
                                         ao_vivo = ao_vivo + f"\n⚽️ <b>{ligas[e][i + 2]} {ligas[e][i + 4]} ✖️ {ligas[e][i + 5]} {ligas[e][i + 3]}</b>\n"
                                         ao_vivo = ao_vivo + f"⌛️ <b>{ligas[e][i + 0]} 🕐 {ligas[e][i + 1]}</b>\n"
                                     else:

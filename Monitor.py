@@ -720,6 +720,8 @@ Deu merda, aqui no Tryzão, o que foi: {error.__class__}\n
                         logging.error(info)
                         try_again += 1
                         info = f"Algum erro durante a execução, vou tentar de novo! Tentativas : {try_again}"
+                        tamanho_ant = 0
+                        tamanho_atu = 0
                         print(info)
                         logging.error(info)
                         if try_again >= 8:
