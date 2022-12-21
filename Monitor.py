@@ -209,6 +209,8 @@ class Watcher:
         t_obs = 0
         time_space = random.randrange(15, 30)
         st = False
+        sum = ""
+        stats = ""
 
         async with async_playwright() as p:
 
@@ -308,40 +310,85 @@ class Watcher:
                             if "active" not in btn_state:
                                 await control.nth(4).click()
                                 print("Ativei o Botao!")
-                            try:
-                                await pagina.wait_for_selector("role=tab")
-                            except TimeoutError:
-                                await control.nth(4).click()
-                                await pagina.wait_for_selector("role=tab")
-                            print("Monitorando normalmente: ", link)
-                            logging.info(f"Monitorando normalmente: {link}")
-                            l_crono = pagina.locator('role=tab')
-                            await l_crono.nth(1).click()
-                            await asyncio.sleep(3)
-                            await pagina.wait_for_selector(".sr-lmt-plus-1-detailed-statistics__content")
-                            estatisticas = await pagina.locator(
-                                ".sr-lmt-plus-1-detailed-statistics__content").inner_text()
-                            stats = estatisticas.split("\n")
-                            await l_crono.nth(2).click()
-                            await asyncio.sleep(3)
-                            await pagina.wait_for_selector(
-                                ".sr-lmt-plus-pbp-tennis-handball__row.sr-lmt-plus-pbp-event__wrapper")
-                            atual = pagina.locator(
-                                ".sr-lmt-plus-pbp-tennis-handball__row.sr-lmt-plus-pbp-event__wrapper")
-                            tamanho_atu = await atual.count()
+                                await asyncio.sleep(3)
 
-                            for a in range(await atual.count()):
-                                lst_atu = await atual.nth(a).inner_text()
-                                lst_atu = lst_atu.split("\n")
-                                if len(lst_atu) > 3:
-                                    fato += lst_atu[0] + "\n"
-                                    fato += lst_atu[1] + "\n"
-                                    fato += lst_atu[2] + "\n"
-                                    logging.info(f"Achei um score solto: \n{await atual.nth(a).inner_text()}")
-                                else:
-                                    fato = fato + await atual.nth(a).inner_text() + "\n"
+                            frames = pagina.frames
+                            print(f"Total de frames:{len(frames)}")
 
-                            fato_splt = fato.split("\n")
+                            if len(frames) > 3:
+                                wab_f = True
+                                while wab_f:
+                                    await asyncio.sleep(2)
+                                    frames = pagina.frames
+                                    for ind, i in enumerate(frames):
+                                        if "wab" in str(i):
+                                            print(
+                                                f"Achei o frame, vou monitorar normalmente no modo alternativo: {link}")
+                                            print(i)
+                                            wab_f = False
+                                            wab = frames[ind]
+                                            tracker = wab.locator(".stats-tracker")
+                                            await tracker.locator(".icon.icon-commentary").click()
+                                            coments = await tracker.locator(".comments.major.corner").inner_text()
+                                            lista_coments = coments.split("\n")
+
+                                            if await tracker.locator(".icon.icon-team-stats").is_visible():
+                                                await tracker.locator(".icon.icon-team-stats").click()
+                                                cw = tracker.locator(".custom-widget")
+                                                for wid in range(await cw.count()):
+                                                    # await asyncio.sleep(2)
+                                                    sum = sum + await cw.nth(wid).inner_text() + "\n"
+                                                    lista_sum = sum.split("\n")
+
+                                                    print(lista_sum)
+                                                    print(coments.split("\n"))
+                                                lista_sum.insert(16, "Cartões Amarelos")
+                                                lista_sum.insert(19, "Cartões Vermelhos")
+                                                print(f"Sumário do jogo:{lista_sum}")
+                                                stats = lista_sum
+
+                                            print(f"Lances do jogo:{lista_coments}")
+                                            tamanho_atu = len(lista_coments)
+                                            fato_splt = lista_coments
+                                            await control.nth(4).click()
+                                            break
+
+                            else:
+
+                                try:
+                                    await pagina.wait_for_selector("role=tab")
+                                except TimeoutError:
+                                    await control.nth(4).click()
+                                    await pagina.wait_for_selector("role=tab")
+                                print("Monitorando normalmente: ", link)
+                                logging.info(f"Monitorando normalmente: {link}")
+                                l_crono = pagina.locator('role=tab')
+                                await l_crono.nth(1).click()
+                                await asyncio.sleep(3)
+                                await pagina.wait_for_selector(".sr-lmt-plus-1-detailed-statistics__content")
+                                estatisticas = await pagina.locator(
+                                    ".sr-lmt-plus-1-detailed-statistics__content").inner_text()
+                                stats = estatisticas.split("\n")
+                                await l_crono.nth(2).click()
+                                await asyncio.sleep(3)
+                                await pagina.wait_for_selector(
+                                    ".sr-lmt-plus-pbp-tennis-handball__row.sr-lmt-plus-pbp-event__wrapper")
+                                atual = pagina.locator(
+                                    ".sr-lmt-plus-pbp-tennis-handball__row.sr-lmt-plus-pbp-event__wrapper")
+                                tamanho_atu = await atual.count()
+
+                                for a in range(await atual.count()):
+                                    lst_atu = await atual.nth(a).inner_text()
+                                    lst_atu = lst_atu.split("\n")
+                                    if len(lst_atu) > 3:
+                                        fato += lst_atu[0] + "\n"
+                                        fato += lst_atu[1] + "\n"
+                                        fato += lst_atu[2] + "\n"
+                                        logging.info(f"Achei um score solto: \n{await atual.nth(a).inner_text()}")
+                                    else:
+                                        fato = fato + await atual.nth(a).inner_text() + "\n"
+
+                                fato_splt = fato.split("\n")
 
                         # Monitoramento alternativo
                         else:
@@ -454,7 +501,6 @@ class Watcher:
 
                             if not alt_monit:
                                 if stats:
-                                    # print(f"Stats bruto: \n{stats}")
 
                                     for i in range(len(stats)):
                                         if stats[i] == "OPORTUNIDADES DE GOLO":
@@ -462,26 +508,56 @@ class Watcher:
 ❌🥅 Oportunidades de gol:\n
 {score_splt[0]} - {stats[i - 1]} 
 {score_splt[5]} - {stats[i + 1]}\n'''
-                                            # print(f"Stats refinado: \n{stats_p}")
-                                        if stats[i] == "REMATES À BALIZA":
+
+                                        if stats[i] == "Remates":
                                             stats_p = stats_p + f'''
+👟 Chutes totais:\n
+{score_splt[0]} - {stats[i - 1]} 
+{score_splt[5]} - {stats[i + 1]}\n'''
+
+                                        if stats[i] == "Remates Para Fora":
+                                            stats_p = stats_p + f'''
+👟❌🥅 Chutes para fora:\n
+{score_splt[0]} - {stats[i - 1]} 
+{score_splt[5]} - {stats[i + 1]}\n'''
+
+                                        if stats[i] == "REMATES À BALIZA" or stats[i] == "Remates À Baliza":
+                                            if "Chutes ao gol" not in stats_p:
+                                                stats_p = stats_p + f'''
 👟 🥅 Chutes ao gol:\n                                                         
 {score_splt[0]} - {stats[i - 1]}                                             
 {score_splt[5]} - {stats[i + 1]}\n'''
-                                            # print(f"Stats refinado: \n{stats_p}")
+
+                                        if stats[i] == "Precisão Nas Finalizações":
+                                            stats_p = stats_p + f'''
+👟🎯🥅 Precisão nas finalizações:\n
+{score_splt[0]} - {stats[i - 1]}% 
+{score_splt[5]} - {stats[i + 1]}%\n'''
 
                                         if stats[i] == "POSSE DE BOLA":
-                                            stats_p = stats_p + f'''
+                                            if stats[i - 1].isdigit() and stats[i + 1].isdigit():
+                                                stats_p = stats_p + f'''
 ⚽️ Posse de Bola:\n                                                                 
 {score_splt[0]} - {stats[i - 1]}                                                    
 {score_splt[5]} - {stats[i + 1]}\n'''
-                                            # print(f"Stats refinado: \n{stats_p}")
-                                        if stats[i] == "ATAQUE PERIGOSO":
-                                            stats_p = stats_p + f'''
+                                            else:
+                                                stats_p = stats_p + f'''
+⚽️ Posse de Bola:\n                                                                 
+{score_splt[0]} - {stats[i - 2]}%                                                    
+{score_splt[5]} - {stats[i + 2]}%\n'''
+
+                                        if stats[i] == "ATAQUE PERIGOSO" or stats[i] == "Ataques Perigosos":
+                                            if stats[i - 1].isdigit():
+                                                stats_p = stats_p + f'''
+🎯 Ataque Perigoso:\n                                                               
+{score_splt[0]} - {stats[i - 1]}%                                                   
+{score_splt[5]} - {stats[i + 1]}%\n'''
+                                            else:
+                                                stats_p = stats_p + f'''
 🎯 Ataque Perigoso:\n                                                               
 {score_splt[0]} - {stats[i - 1]}                                                   
 {score_splt[5]} - {stats[i + 1]}\n'''
-                                            # print(f"Stats refinado: \n{stats_p}")
+
                                         if stats[i] == "ATAQUE":
                                             stats_p = stats_p + f'''
 🎯 Ataque:\n                                                                         
@@ -500,13 +576,13 @@ class Watcher:
 {score_splt[0]} - {stats[i - 1]}                                                    
 {score_splt[5]} - {stats[i + 1]}\n'''
 
-                                        if stats[i] == "FORAS DE JOGO":
+                                        if stats[i] == "FORAS DE JOGO" or stats[i] == "Foras De Jogo":
                                             stats_p = stats_p + f'''
 ⛔️⚽️ Impedimentos:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
 {score_splt[5]} - {stats[i + 1]}\n'''
 
-                                        if stats[i] == "FALTAS":
+                                        if stats[i] == "FALTAS" or stats[i] == "Faltas Cometidas":
                                             stats_p = stats_p + f'''
 ✖️⚽️ Faltas:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
@@ -555,7 +631,7 @@ class Watcher:
                                     ("segundo tempo" not in fato_splt[0]) or ("segunda parte" not in fato_splt[0])):
 
                                 # Atualizacao no modo alternativo
-                                if alt_monit:
+                                if alt_monit or len(frames) > 3:
                                     if diff >= 2 and tamanho_ant > 0:
                                         rows = diff
                                         x = diff - 2
@@ -637,7 +713,26 @@ class Watcher:
                                             z = z - 3
                                             rows -= 1
 
-                        if alt_monit:
+                        if len(frames) > 3:
+                            if len(fato_splt) > 1 and fato_splt[0] != "Início do segundo tempo":
+                                stats_now = f'''<b>\n
+⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⌛️ {score_splt[1]}\n                                                         
+{stats_p}\n                                                                      
+⚠️ Último Lance:\n                                                             
+⌛️  {fato_splt[0]}\n                                                                                                     
+⚠️ {fato_splt[1]}\n   
+'''
+                            else:
+                                stats_now = f'''<b>\n
+⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⌛️ {score_splt[1]}\n                                                         
+{stats_p}\n  
+⚠️ Último Lance:\n
+➕ {fato_splt[0]}\n  
+'''
+                        elif alt_monit:
+
                             if len(fato_splt) > 1 and fato_splt[0] != "Início do segundo tempo":
                                 stats_now = f'''<b>\n
 ⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       

@@ -75,7 +75,6 @@ async def torcer(jogo):
                                     logging.info(f"Demorei {t_final - t_inicial} para achar!")
                                     html = await match.nth(i).inner_html()
                                     await match.nth(i).click()
-                                    await page.wait_for_selector(".live-incidents__container__title")
                                     score = await page.locator(".scoreboard__top").inner_text()
                                     score_splt = score.split("\n")
                                     print(score_splt)
@@ -89,6 +88,8 @@ async def torcer(jogo):
                                     if tempo == "0:00":
                                         logging.info("O jogo ainda não começou!")
                                         return "O jogo ainda não começou!"
+
+                                    #await page.wait_for_selector(".live-incidents__container__title")
 
                                     stats_now = f'''<b>⚽️ {casa} {p_casa} x {p_fora} {fora}\n
 ⌛️ {tempo}\n</b>'''
