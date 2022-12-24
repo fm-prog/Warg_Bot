@@ -1,6 +1,8 @@
 import datetime
 import logging
 import asyncio
+from traceback import format_tb
+
 import aioschedule
 from telebot.async_telebot import AsyncTeleBot
 from telebot.async_telebot import types
@@ -70,7 +72,7 @@ async def responder(mensagem):
 '''
     if len(str(texto)) > 4096:
         for x in range(0, len(str(texto)), 4096):
-            await bot.send_message(mensagem.chat.id, f"<b>{texto[x:x + 4096]}</b>", parse_mode="HTML")
+            await bot.reply_to(mensagem, f"<b>{texto[x:x + 4096]}</b>", parse_mode="HTML")
     else:
         await bot.reply_to(mensagem, f"<b>{texto}</b>", parse_mode="HTML")
 
@@ -211,13 +213,24 @@ async def atualizacao_apostador(msg):
     """
     if Apostador.infos:
         for i in Apostador.infos:
-            print(f"Fila de Atualização: {Apostador.infos}")
-            print(f"Vai atualizar: {i}")
+            # print(f"Fila de Atualização: {Apostador.infos}")
+            # print(f"Vai atualizar: {i}")
             await bot.send_chat_action(msg.chat.id, 'typing')
-            await bot.send_message(msg.chat.id, i, parse_mode="HTML")
+
+            try:
+                if len(str(i)) > 4096:
+                    for x in range(0, len(str(i)), 4096):
+                        await bot.send_message(msg.chat.id, f"<b>{i[x:x + 4096]}</b>", parse_mode="HTML")
+                else:
+                    await bot.send_message(msg.chat.id, f"<b>{i}</b>", parse_mode="HTML")
+            except Exception as error:
+                print(f"Deu merda, aqui o que foi: {error.__class__}")
+                print(error)
+                print(format_tb(error.__traceback__))
+
             index = Apostador.infos.index(i)
             del (Apostador.infos[index])
-            print(f"Ainda na fila: {Apostador.infos}")
+            # print(f"Ainda na fila: {Apostador.infos}")
 
 
 async def atualizacao_lance(msg):
@@ -272,10 +285,47 @@ async def atualizacao_lance(msg):
                 await bot.send_sticker(msg.chat.id,
                                        "CAACAgIAAxkBAAEGMY5jV9cNETQZZSeg1XHnJfULac87JwACUgADQbVWDAIQ4mRpfw9yKgQ")
 
-            await bot.send_message(msg.chat.id, i, parse_mode="HTML")
+            try:
+                if len(str(i)) > 4096:
+                    for x in range(0, len(str(i)), 4096):
+                        await bot.send_message(msg.chat.id, f"<b>{i[x:x + 4096]}</b>", parse_mode="HTML")
+                else:
+                    await bot.send_message(msg.chat.id, f"<b>{i}</b>", parse_mode="HTML")
+            except Exception as error:
+                print(f"Deu merda, aqui o que foi: {error.__class__}")
+                print(error)
+                print(format_tb(error.__traceback__))
+
             index = Warg.infos.index(i)
             del (Warg.infos[index])
             print(f"Ainda na fila: {Warg.infos}")
+
+
+@bot.message_handler(commands=['rotinas'])
+async def responder(msg):
+    """
+    Função que retorna as rotinas do Apostador em execução!
+    """
+    if Apostador.ativo:
+        desocup = ""
+        await bot.send_message(msg.chat.id,
+                               f"<b>👁‍🗨 Fila de jogos para o monitoramento: {Apostador.soloq_jogos.qsize()} jogos...</b>",
+                               parse_mode="HTML")
+        for t, i in enumerate(Apostador.Observers):
+            await bot.send_chat_action(msg.chat.id, 'typing')
+            if i != "Stand By":
+                await bot.send_message(msg.chat.id, f"<b>👁‍🗨 {i}</b>", parse_mode="HTML")
+            else:
+                desocup += f"<b>👁‍🗨 O Observador {t + 1} está desocupado!\n</b>"
+
+        if desocup != "":
+            await bot.send_chat_action(msg.chat.id, 'typing')
+            await bot.send_sticker(msg.chat.id,
+                                   "CAACAgIAAxkBAAEGMaRjV9hH3th0IoUpQDFyvkkMsQ61KwACUAADQbVWDEsUyxvLOcdYKgQ")
+            await bot.send_message(msg.chat.id, desocup, parse_mode="HTML")
+    else:
+        await bot.reply_to(msg, "<b>⚠️ Ative primeiro a função apostador através do comando /apostador!</b>",
+                           parse_mode="HTML")
 
 
 async def monitoramento(msg):
@@ -290,7 +340,7 @@ async def monitoramento(msg):
             await bot.send_message(msg.chat.id, f"<b>👁‍🗨 O Observador {t + 1} está se despedindo da galera!\n</b>",
                                    parse_mode="HTML")
         elif i != "Stand By":
-            await bot.send_message(msg.chat.id, i, parse_mode="HTML")
+            await bot.send_message(msg.chat.id, f"<b>{i}</b>", parse_mode="HTML")
         else:
             desocup += f"<b>👁‍🗨 O Observador {t + 1} está desocupado!\n</b>"
 
