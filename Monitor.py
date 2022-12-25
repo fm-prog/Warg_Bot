@@ -17,7 +17,7 @@ async def catch_alt(penal, canto, fato_splt, score_splt, stats_p, alerta, amarel
 ⛳️ Escanteio!\n  
 ⌛️  {fato_splt[x]}\n                                                                                                     
 ⚠️ {fato_splt[y]}\n                                                                                                                                                                                                                                                                                                     
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n                                                
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n                                                
 {stats_p}'''
 
     elif vermelho:
@@ -25,7 +25,7 @@ async def catch_alt(penal, canto, fato_splt, score_splt, stats_p, alerta, amarel
 🟥 Cartão Vermelho!\n                                                  
 ⌛️  {fato_splt[x]}\n                                                                                                     
 ⚠️ {fato_splt[y]}\n                                                  
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n  
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n  
 {stats_p}'''
 
     elif amarelo:
@@ -33,7 +33,7 @@ async def catch_alt(penal, canto, fato_splt, score_splt, stats_p, alerta, amarel
 🟨 Cartão Amarelo!\n                                                    
 ⌛️  {fato_splt[x]}\n                                                                                                     
 ⚠️ {fato_splt[y]}\n                                                  
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n   
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n   
 {stats_p}'''
 
     elif penal:
@@ -42,14 +42,14 @@ async def catch_alt(penal, canto, fato_splt, score_splt, stats_p, alerta, amarel
 ⚠️ ⛔️🥅 Perdeu!\n                                                             
 ⌛️  {fato_splt[x]}\n                                                                                                     
 ⚠️ {fato_splt[y]}\n                                                
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n  
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n  
 {stats_p}'''
         else:
             lance_now = f'''\n
 ⚠️ 🥅 Penal!\n                                                             
 ⌛️  {fato_splt[x]}\n                                                                                                     
 ⚠️ {fato_splt[y]}\n                                                
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n  
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n  
 {stats_p}'''
 
     elif gol:
@@ -58,14 +58,14 @@ async def catch_alt(penal, canto, fato_splt, score_splt, stats_p, alerta, amarel
 ❌ Anulou!!\n                                                             
 ⌛️  {fato_splt[x]}\n                                                                                                     
 ⚠️ {fato_splt[y]}\n                                                
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n  
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n  
 {stats_p}'''
         else:
             lance_now = f'''\n
 🥅 Gol!\n                                                             
 ⌛️  {fato_splt[x]}\n                                                                                                     
 ⚠️ {fato_splt[y]}\n                                                
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n  
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n  
 {stats_p}'''
 
     if lance_now != "":
@@ -109,7 +109,7 @@ async def catch_normal(penal, canto, fato_splt, score_splt, stats_p, alerta, ama
 ⚠️ {fato_splt[z]}\n                                                                                                    
 ➕ {fato_splt[y]}\n                                                                                                  
 ⌛️  {fato_splt[x]}\n                                                                                                
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n                                                
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n                                                
 {stats_p}'''
 
     elif vermelho:
@@ -118,7 +118,7 @@ async def catch_normal(penal, canto, fato_splt, score_splt, stats_p, alerta, ama
 ⚠️ {fato_splt[z]}\n                                                      
 ➕ {fato_splt[y]}\n                                                    
 ⌛️  {fato_splt[x]}\n                                                  
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n  
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n  
 {stats_p}'''
 
     elif amarelo:
@@ -127,7 +127,7 @@ async def catch_normal(penal, canto, fato_splt, score_splt, stats_p, alerta, ama
 ⚠️ {fato_splt[z]}\n                                                       
 ➕ {fato_splt[y]}\n                                                     
 ⌛️  {fato_splt[x]}\n                                                   
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n   
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n   
 {stats_p}'''
 
     elif penal:
@@ -136,7 +136,7 @@ async def catch_normal(penal, canto, fato_splt, score_splt, stats_p, alerta, ama
 ⚠️ {fato_splt[z]}\n                                                     
 ➕ {fato_splt[y]}\n                                                   
 ⌛️ {fato_splt[x]}\n                                                 
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n  
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n  
 {stats_p}'''
 
     elif gol:
@@ -145,7 +145,7 @@ async def catch_normal(penal, canto, fato_splt, score_splt, stats_p, alerta, ama
 ⚠️ {fato_splt[z]}\n                                                     
 ➕ {fato_splt[y]}\n                                                   
 ⌛️ {fato_splt[x]}\n                                                 
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n  
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n  
 {stats_p}'''
 
     if lance_now != "":
@@ -408,10 +408,10 @@ class Watcher:
                                     # if not inc_find:
                                     fato_splt[ind] = f"Gol! - {score_splt[0]}"
 
-                                if inc == score_splt[5]:
+                                if inc == score_splt[-1]:
                                     # inc_find = re.search("[a-z]", fato_splt[ind - 1])
                                     # if not inc_find:
-                                    fato_splt[ind] = f"Gol! - {score_splt[5]}"
+                                    fato_splt[ind] = f"Gol! - {score_splt[-1]}"
                             # await drop.click()
 
                             print(f"Transformei os incidents, receba!\n{fato_splt}")
@@ -430,11 +430,6 @@ class Watcher:
                             print(f"Mid diff: {diff}")
                             logging.info(f"Mid diff: {diff}")
 
-                            # Tenho que mudar isso!
-                            if "+" in score_splt[2]:
-                                logging.info(f"Achei o +, tenho que mudar isso!: {score_splt[2]}")
-                                del (score_splt[2])
-
                             # For para pegar o status do jogo
                             for i, inc in enumerate(incidents):
 
@@ -451,8 +446,8 @@ class Watcher:
 
                                 if inc == "Fim do primeiro tempo":
                                     print(
-                                        f"Oque,quando,quem: {incidents[i]} - 45+ - ⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}")
-                                    quem = f"{score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}"
+                                        f"Oque,quando,quem: {incidents[i]} - 45+ - ⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}")
+                                    quem = f"{score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}"
                                     await self.observar.atualizacao(incidents[i], "999", quem)
                                     print("Final do primeiro tempo!")
                                     logging.info(f"{incidents[i]} - 45+ - {quem}")
@@ -461,8 +456,8 @@ class Watcher:
 
                                 if inc == "Fim do segundo tempo" or inc == "Fim da partida":
                                     print(
-                                        f"Oque,quando,quem: {incidents[i]} - 90+ - ⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}")
-                                    quem = f"{score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}"
+                                        f"Oque,quando,quem: {incidents[i]} - 90+ - ⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}")
+                                    quem = f"{score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}"
                                     await self.observar.atualizacao(incidents[i], "999", quem)
                                     print("Final do jogo!")
                                     logging.info(f"{incidents[i]} - 90+ - {quem}")
@@ -493,13 +488,13 @@ class Watcher:
                             stats_p = stats_p + f'''
 🟨 Cartões Amarelos:\n
 {score_splt[0]} - {amarelo_casa}
-{score_splt[5]} - {amarelo_fora}\n
+{score_splt[-1]} - {amarelo_fora}\n
 🟥 Cartões Vermelhos:\n
 {score_splt[0]} - {red_casa}
-{score_splt[5]} - {red_fora}\n
+{score_splt[-1]} - {red_fora}\n
 ⛳️ Escanteios:\n                                                             
 {score_splt[0]} - {cantos_casa}                                             
-{score_splt[5]} - {cantos_fora}\n'''
+{score_splt[-1]} - {cantos_fora}\n'''
 
                             if not alt_monit:
                                 if stats:
@@ -509,86 +504,86 @@ class Watcher:
                                             stats_p = stats_p + f'''
 ❌🥅 Oportunidades de gol:\n
 {score_splt[0]} - {stats[i - 1]} 
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "Remates":
                                             stats_p = stats_p + f'''
 👟 Chutes totais:\n
 {score_splt[0]} - {stats[i - 1]} 
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "Remates Para Fora":
                                             stats_p = stats_p + f'''
 👟❌🥅 Chutes para fora:\n
 {score_splt[0]} - {stats[i - 1]} 
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "REMATES À BALIZA" or stats[i] == "Remates À Baliza":
                                             if "Chutes ao gol" not in stats_p:
                                                 stats_p = stats_p + f'''
 👟 🥅 Chutes ao gol:\n                                                         
 {score_splt[0]} - {stats[i - 1]}                                             
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "Precisão Nas Finalizações":
                                             stats_p = stats_p + f'''
 👟🎯🥅 Precisão nas finalizações:\n
 {score_splt[0]} - {stats[i - 1]}% 
-{score_splt[5]} - {stats[i + 1]}%\n'''
+{score_splt[-1]} - {stats[i + 1]}%\n'''
 
                                         if stats[i] == "POSSE DE BOLA":
                                             if stats[i - 1].isdigit() and stats[i + 1].isdigit():
                                                 stats_p = stats_p + f'''
 ⚽️ Posse de Bola:\n                                                                 
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
                                             else:
                                                 stats_p = stats_p + f'''
 ⚽️ Posse de Bola:\n                                                                 
 {score_splt[0]} - {stats[i - 2]}%                                                    
-{score_splt[5]} - {stats[i + 2]}%\n'''
+{score_splt[-1]} - {stats[i + 2]}%\n'''
 
                                         if stats[i] == "ATAQUE PERIGOSO" or stats[i] == "Ataques Perigosos":
                                             if stats[i - 1].isdigit():
                                                 stats_p = stats_p + f'''
 🎯 Ataques Perigosos:\n                                                               
 {score_splt[0]} - {stats[i - 1]}                                                   
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
                                             else:
                                                 stats_p = stats_p + f'''
 🎯 Ataque Perigoso:\n                                                               
 {score_splt[0]} - {stats[i - 1]}                                                   
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "ATAQUE":
                                             stats_p = stats_p + f'''
 🎯 Ataque:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "BOLA SEGURA":
                                             stats_p = stats_p + f'''
 ⚽️ Bola Segura:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "DEFESAS":
                                             stats_p = stats_p + f'''
 🥅🎯 Defesas:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "FORAS DE JOGO" or stats[i] == "Foras De Jogo":
                                             stats_p = stats_p + f'''
 ⛔️⚽️ Impedimentos:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "FALTAS" or stats[i] == "Faltas Cometidas":
                                             stats_p = stats_p + f'''
 ✖️⚽️ Faltas:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                             print(f"Fatos do jogo:\n {fato_splt}")
                             # print(f"Stats do jogo:\n {stats_p}")
@@ -599,7 +594,7 @@ class Watcher:
                                 if self.observar.end:
                                     lance_now = f'''\n
 ⚠️Acabou!\n                                                                                                       
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n
 {stats_p}
 ⚠️ #Partiu, os observadores terminaram o trabalho e estão a espera de uma nova tarefa!\n'''
                                     await self.observar.sair(self.torcer_yellow)
@@ -619,7 +614,7 @@ class Watcher:
                                 if self.observar.half:
                                     lance_now = f'''\n
 ⚠️ Intervalo!\n                                                                                                   
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n
 {stats_p}
 ⚠️ #Partiu, os observadores foram tomar uma gelada, voltarão quando o intervalo acabar!\n'''
                                     Warg.monitorados[ind_obs] = lance_now
@@ -720,7 +715,7 @@ class Watcher:
                         if len(frames) > 3:
                             if len(fato_splt) > 1 and fato_splt[0] != "Início do segundo tempo":
                                 stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n                                                                      
 ⚠️ Último Lance:\n                                                             
@@ -729,7 +724,7 @@ class Watcher:
 '''
                             else:
                                 stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n  
 ⚠️ Último Lance:\n
@@ -739,7 +734,7 @@ class Watcher:
 
                             if len(fato_splt) > 1 and fato_splt[0] != "Início do segundo tempo":
                                 stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n                                                                      
 ⚠️ Último Lance:\n                                                             
@@ -749,7 +744,7 @@ class Watcher:
 '''
                             else:
                                 stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n  
 ⚠️ Último Lance:\n
@@ -764,7 +759,7 @@ class Watcher:
                         else:
                             if len(fato_splt) > 2 and "segundo tempo" not in incidents[0]:
                                 stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n                                                                      
 ⚠️ Último Lance:\n                                                             
@@ -774,7 +769,7 @@ class Watcher:
 '''
                             else:
                                 stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n                                                                      
 ⚠️ Último Lance:\n

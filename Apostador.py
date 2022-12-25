@@ -47,8 +47,8 @@ async def initial_monit(pagina):
             incidents.insert(ind, incidents[ind + 1])
         if inc == score_splt[0]:
             incidents[ind] = f"Gol! - {score_splt[0]}"
-        if inc == score_splt[5]:
-            incidents[ind] = f"Gol! - {score_splt[5]}"
+        if inc == score_splt[-1]:
+            incidents[ind] = f"Gol! - {score_splt[-1]}"
 
     for i, inc in enumerate(incidents):
         if "cartão amarelo" in inc:
@@ -74,13 +74,13 @@ async def initial_monit(pagina):
     stats_p = stats_p + f'''
 🟨 Cartões Amarelos:\n
 {score_splt[0]} - {amarelo_casa}
-{score_splt[5]} - {amarelo_fora}\n
+{score_splt[-1]} - {amarelo_fora}\n
 🟥 Cartões Vermelhos:\n
 {score_splt[0]} - {red_casa}
-{score_splt[5]} - {red_fora}\n
+{score_splt[-1]} - {red_fora}\n
 ⛳️ Escanteios:\n                                                             
 {score_splt[0]} - {cantos_casa}                                             
-{score_splt[5]} - {cantos_fora}\n'''
+{score_splt[-1]} - {cantos_fora}\n'''
 
     return score_splt, stats_p, incidents
 
@@ -90,7 +90,7 @@ async def alt_monit(score_splt, stats_p, fatos):
     for fat in fatos:
         facts = facts + fat + "\n"
     stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n    
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n   
 ⚠️ Fatos do jogo:\n'''
@@ -146,11 +146,13 @@ async def normal_monit(pagina, score_splt, stats_p):
                     wab = frames[ind]
                     tracker = wab.locator(".stats-tracker")
                     await tracker.locator(".icon.icon-commentary").click()
+                    await asyncio.sleep(1)
                     coments = await tracker.locator(".comments.major.corner").inner_text()
                     lista_coments = coments.split("\n")
 
                     if await tracker.locator(".icon.icon-team-stats").is_visible():
                         await tracker.locator(".icon.icon-team-stats").click()
+                        await asyncio.sleep(1)
                         cw = tracker.locator(".custom-widget")
                         for wid in range(await cw.count()):
                             # await asyncio.sleep(2)
@@ -208,90 +210,90 @@ async def normal_monit(pagina, score_splt, stats_p):
                 stats_p = stats_p + f'''
 ❌🥅 Oportunidades de gol:\n
 {score_splt[0]} - {stats[i - 1]} 
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "Remates":
                 stats_p = stats_p + f'''
 👟 Chutes totais:\n
 {score_splt[0]} - {stats[i - 1]} 
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "Remates Para Fora":
                 stats_p = stats_p + f'''
 👟❌🥅 Chutes para fora:\n
 {score_splt[0]} - {stats[i - 1]} 
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "REMATES À BALIZA" or stats[i] == "Remates À Baliza":
                 if "Chutes ao gol" not in stats_p:
                     stats_p = stats_p + f'''
 👟 🥅 Chutes ao gol:\n                                                         
 {score_splt[0]} - {stats[i - 1]}                                             
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "Precisão Nas Finalizações":
                 stats_p = stats_p + f'''
 👟🎯🥅 Precisão nas finalizações:\n
 {score_splt[0]} - {stats[i - 1]}% 
-{score_splt[5]} - {stats[i + 1]}%\n'''
+{score_splt[-1]} - {stats[i + 1]}%\n'''
 
             if stats[i] == "POSSE DE BOLA":
                 if stats[i - 1].isdigit() and stats[i + 1].isdigit():
                     stats_p = stats_p + f'''
 ⚽️ Posse de Bola:\n                                                                 
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
                 else:
                     stats_p = stats_p + f'''
 ⚽️ Posse de Bola:\n                                                                 
 {score_splt[0]} - {stats[i - 2]}%                                                    
-{score_splt[5]} - {stats[i + 2]}%\n'''
+{score_splt[-1]} - {stats[i + 2]}%\n'''
 
             if stats[i] == "ATAQUE PERIGOSO" or stats[i] == "Ataques Perigosos":
                 if stats[i - 1].isdigit():
                     stats_p = stats_p + f'''
 🎯 Ataques Perigosos:\n                                                               
 {score_splt[0]} - {stats[i - 1]}                                                   
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
                 else:
                     stats_p = stats_p + f'''
 🎯 Ataque Perigoso:\n                                                               
 {score_splt[0]} - {stats[i - 1]}                                                   
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "ATAQUE":
                 stats_p = stats_p + f'''
 🎯 Ataque:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "BOLA SEGURA":
                 stats_p = stats_p + f'''
 ⚽️ Bola Segura:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "DEFESAS":
                 stats_p = stats_p + f'''
 🥅🎯 Defesas:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "FORAS DE JOGO" or stats[i] == "Foras De Jogo":
                 stats_p = stats_p + f'''
 ⛔️⚽️ Impedimentos:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
             if stats[i] == "FALTAS" or stats[i] == "Faltas Cometidas":
                 stats_p = stats_p + f'''
 ✖️⚽️ Faltas:\n                                                                         
 {score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[5]} - {stats[i + 1]}\n'''
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
     if frame:
         stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n        
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n 
 ⚠️ Fatos do jogo:\n                                                                                                                             
@@ -299,13 +301,115 @@ async def normal_monit(pagina, score_splt, stats_p):
         # {facts_frame}
     else:
         stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[2]} x {score_splt[4]} {score_splt[5]}\n       
+⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n        
 ⌛️ {score_splt[1]}\n                                                         
 {stats_p}\n 
 ⚠️ Fatos do jogo:\n                                                                                                                              
 '''
     # {facts_normal}
     return stats_now
+
+
+async def promise(rotina, pagina, match):
+    jogo = await soloq_jogos.get()
+    try:
+        print(f"Ainda na soloq:{soloq_jogos.qsize()}")
+        logging.info(f"Ainda na soloq:{soloq_jogos.qsize()}")
+        print(f"Observador {rotina + 1} no jogo de número {jogo}!")
+        Observers[rotina] = f"Observador {rotina + 1} no jogo de número {jogo}!"
+        print(Observers)
+        logging.info(f"lista dos observadores: {Observers}")
+        logging.info(f"Observador {rotina + 1} no jogo de número {jogo}!")
+        await match.nth(jogo).hover()
+        await match.nth(jogo).click()
+        await asyncio.sleep(1)
+        await pagina.wait_for_selector(".control-events-title")
+        locator = pagina.locator(".control-events-title")
+        html_events = await locator.inner_html()
+
+        if "FOOT" in html_events:
+            print("Confirmei e é jogo!")
+            logging.info("Confirmei e é jogo!")
+        else:
+            logging.error("Confirmei e não é jogo!")
+            return print("Confirmei e não é jogo!")
+
+        if "(Esports)" not in await match.nth(jogo).inner_text():
+            if "(Simulação)" not in await match.nth(jogo).inner_text():
+                await pagina.wait_for_selector(".scoreboard__top")
+                score = await pagina.locator(".scoreboard__top").inner_text()
+                score_splt = score.split("\n")
+                casa = score_splt[0]
+                while casa not in await match.nth(jogo).inner_text():
+                    score = await pagina.locator(".scoreboard__top").inner_text()
+                    score_splt = score.split("\n")
+                    casa = score_splt[0]
+
+                fora = score_splt[-1]
+                tempo = score_splt[1]
+
+                if tempo == "0:00":
+                    logging.error("O jogo ainda não começou!")
+                    return print("O jogo ainda não começou!")
+
+                score_splt, stats_p, fatos_drop = await initial_monit(pagina)
+
+                await pagina.wait_for_selector(".control-events-title")
+                await pagina.locator(".control-events-title").click()
+                await asyncio.sleep(1)
+                await pagina.wait_for_selector(".dropdown-item")
+                drop = pagina.locator(".dropdown-item")
+
+                for d in range(await drop.count()):
+                    if await drop.nth(d).inner_text() == f"{casa} - {fora}":
+                        await pagina.locator(".control-events-title").click()
+                        stats_now = await normal_monit(pagina, score_splt, stats_p)
+                        break
+                else:
+                    await pagina.locator(".control-events-title").click()
+                    stats_now = await alt_monit(score_splt, stats_p, fatos_drop)
+
+                if not ativo:
+                    return await trigger("Motor da função apostador interrompido pelo usuário!")
+
+                print(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
+                logging.info(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
+                await trigger(stats_now)
+
+            else:
+                print("Jogo simulação, passei!")
+                logging.info("Jogo simulação, passei!")
+
+        else:
+            print("Jogo Esport, passei!")
+            logging.info("Jogo Esport, passei!")
+
+    except IndexError as error:
+        print(f"Deu out of range, vou continuar e tirar o item da lista: {error.__class__}")
+        print(error)
+        print(format_tb(error.__traceback__))
+        info = f'''
+Deu merda, aqui no try da soloq_jogos, erro de range: {error.__class__}\n
+{error}\n
+{format_tb(error.__traceback__)}\n
+'''
+        print(f"Observador {rotina + 1} no jogo de número {jogo}, pulou a tarefa devido a um erro!")
+        logging.error(info)
+
+    except Exception as error:
+        print(f"Deu merda, aqui o que foi: {error.__class__}")
+        print(error)
+        print(format_tb(error.__traceback__))
+        info = f'''
+Deu merda, aqui no try da soloq_jogos, o que foi: {error.__class__}\n
+{error}\n
+{format_tb(error.__traceback__)}\n
+'''
+        logging.error(info)
+
+    Observers[rotina] = "Stand By"
+    logging.info(f"Observador {rotina + 1} terminou todas as atividades!")
+    return print(f"Observador {rotina + 1} terminou todas as atividades!")
 
 
 async def multi_pages(rotina):
@@ -352,90 +456,16 @@ async def multi_pages(rotina):
             print("Farei a rotina porque igualou!")
 
             while not soloq_jogos.empty():
-                jogo = await soloq_jogos.get()
+
+                task = promise(rotina, pagina, match)
                 try:
-                    print(f"Ainda na soloq:{soloq_jogos.qsize()}")
-                    logging.info(f"Ainda na soloq:{soloq_jogos.qsize()}")
-                    print(f"Observador {rotina + 1} no jogo de número {jogo}!")
-                    Observers.insert(rotina, f"Observador {rotina + 1} no jogo de número {jogo}!")
-                    print(Observers[rotina])
-                    logging.info(Observers[rotina])
-                    logging.info(f"Observador {rotina + 1} no jogo de número {jogo}!")
-                    await match.nth(jogo).hover(timeout=0, force=True)
-                    await match.nth(jogo).click()
-                    if "(Esports)" not in await match.nth(jogo).inner_text():
-                        if "(Simulação)" not in await match.nth(jogo).inner_text():
-                            await pagina.wait_for_selector(".scoreboard__top")
-                            score = await pagina.locator(".scoreboard__top").inner_text()
-                            score_splt = score.split("\n")
-                            casa = score_splt[0]
-                            while casa not in await match.nth(jogo).inner_text():
-                                score = await pagina.locator(".scoreboard__top").inner_text()
-                                score_splt = score.split("\n")
-                                casa = score_splt[0]
+                    await asyncio.wait_for(task, timeout=120)
+                except asyncio.TimeoutError:
+                    print(f"Demorou tempo demais, vou reiniciar a rotina se ainda tiverem itens na queue!")
+                    logging.info("Demorou tempo demais, vou reiniciar a rotina se ainda tiverem itens na queue!")
+                    await trigger("⚠️ Demorou tempo demais, vou reiniciar a rotina se ainda tiverem itens na queue!")
 
-                            fora = score_splt[-1]
-                            tempo = score_splt[-5]
-
-                            if await is_placar(score_splt[-2]) and score_splt[-3] == "-":
-                                print("Confirmei e é jogo!")
-                            else:
-                                break
-
-                            if tempo == "0:00":
-                                print("O jogo ainda não começou!")
-                                continue
-
-                            score_splt, stats_p, fatos_drop = await initial_monit(pagina)
-
-                            await pagina.wait_for_selector(".control-events-title")
-                            await pagina.locator(".control-events-title").click()
-                            await pagina.wait_for_selector(".dropdown-item")
-                            drop = pagina.locator(".dropdown-item")
-
-                            for d in range(await drop.count()):
-                                if await drop.nth(d).inner_text() == f"{casa} - {fora}":
-                                    await pagina.locator(".control-events-title").click()
-                                    stats_now = await normal_monit(pagina, score_splt, stats_p)
-                                    break
-                            else:
-                                await pagina.locator(".control-events-title").click()
-                                stats_now = await alt_monit(score_splt, stats_p, fatos_drop)
-
-                            if not ativo:
-                                return await trigger("Motor da função apostador interrompido pelo usuário!")
-
-                            print(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
-                            logging.info(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
-                            await trigger(stats_now)
-
-                except IndexError as error:
-                    print(f"Deu out of range, vou continuar e tirar o item da lista: {error.__class__}")
-                    print(error)
-                    print(format_tb(error.__traceback__))
-                    info = f'''
-Deu merda, aqui no try da soloq_jogos, erro de range: {error.__class__}\n
-{error}\n
-{format_tb(error.__traceback__)}\n
-'''
-                    print(f"Observador {rotina + 1} no jogo de número {jogo}, pulou a tarefa devido a um erro!")
-                    logging.error(info)
-
-                except Exception as error:
-                    print(f"Deu merda, aqui o que foi: {error.__class__}")
-                    print(error)
-                    print(format_tb(error.__traceback__))
-                    info = f'''
-Deu merda, aqui no try da soloq_jogos, o que foi: {error.__class__}\n
-{error}\n
-{format_tb(error.__traceback__)}\n
-'''
-                    logging.error(info)
-
-            Observers.insert(rotina, f"Stand By")
             await browser.close()
-            logging.info(f"Observador {rotina + 1} terminou todas as atividades!")
-            return print(f"Observador {rotina + 1} terminou todas as atividades!")
 
 
 async def monitorar():
@@ -481,13 +511,14 @@ async def monitorar():
                         print(f"Demorou tempo demais, vou fazer assim mesmo!")
                         qtd_rows = qtd
                 else:
+
                     qtd_fut = pagina.locator(r"text=Futebol (")
                     qtd_fut = await qtd_fut.inner_text()
                     qtd_fut = re.search(r"\d+", qtd_fut)
                     qtd_fut = int(qtd_fut.group())
                     await browser.close()
                     await solo_queue(qtd_fut)
-                    await asyncio.sleep(random.randrange(300, 600))
+                    await asyncio.sleep(random.randrange(600, 1200))
 
         except Exception as error:
             print(f"Deu merda, aqui o que foi: {error.__class__}")

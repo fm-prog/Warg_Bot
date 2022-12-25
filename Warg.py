@@ -79,7 +79,7 @@ async def torcer(jogo):
                                     score_splt = score.split("\n")
                                     print(score_splt)
 
-                                    tempo = score_splt[-5]
+                                    tempo = score_splt[1]
                                     casa = score_splt[0]
                                     fora = score_splt[-1]
                                     p_casa = score_splt[-4]
