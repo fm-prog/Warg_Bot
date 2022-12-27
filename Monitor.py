@@ -535,13 +535,13 @@ class Watcher:
                                             if stats[i - 1].isdigit() and stats[i + 1].isdigit():
                                                 stats_p = stats_p + f'''
 ⚽️ Posse de Bola:\n                                                                 
-{score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[-1]} - {stats[i + 1]}\n'''
+{score_splt[0]} - {stats[i - 1]}%                                                    
+{score_splt[-1]} - {stats[i + 1]}%\n'''
                                             else:
                                                 stats_p = stats_p + f'''
 ⚽️ Posse de Bola:\n                                                                 
-{score_splt[0]} - {stats[i - 2]}%                                                    
-{score_splt[-1]} - {stats[i + 2]}%\n'''
+{score_splt[0]} - {stats[i - 1]}                                                    
+{score_splt[-1]} - {stats[i + 1]}\n'''
 
                                         if stats[i] == "ATAQUE PERIGOSO" or stats[i] == "Ataques Perigosos":
                                             if stats[i - 1].isdigit():

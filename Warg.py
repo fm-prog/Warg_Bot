@@ -24,7 +24,7 @@ async def torcer(jogo):
     if obs:
         async with async_playwright() as p:
             alternativo = True
-            browser = await p.chromium.launch(headless=False)
+            browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
             await page.goto("https://br.betano.com/live/")
             t_inicial = time.time()

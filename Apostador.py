@@ -5,7 +5,7 @@ import re
 import time
 # from random import random
 from traceback import format_tb
-
+from Data_Aposta import Inter_csv
 from playwright.async_api import async_playwright
 import Func_Lib as Lib
 
@@ -71,16 +71,7 @@ async def initial_monit(pagina):
                 cantos_fora += 1
             logging.info(f"Peguei um escanteio nos incidentes: {inc}")
 
-    stats_p = stats_p + f'''
-🟨 Cartões Amarelos:\n
-{score_splt[0]} - {amarelo_casa}
-{score_splt[-1]} - {amarelo_fora}\n
-🟥 Cartões Vermelhos:\n
-{score_splt[0]} - {red_casa}
-{score_splt[-1]} - {red_fora}\n
-⛳️ Escanteios:\n                                                             
-{score_splt[0]} - {cantos_casa}                                             
-{score_splt[-1]} - {cantos_fora}\n'''
+    stats_p = stats_p + f'''Cartões Amarelos:|{amarelo_casa}|{amarelo_fora}|Cartões Vermelhos:|{red_casa}|{red_fora}|Escanteios:|{cantos_casa}|{cantos_fora}|'''
 
     return score_splt, stats_p, incidents
 
@@ -89,11 +80,7 @@ async def alt_monit(score_splt, stats_p, fatos):
     facts = ""
     for fat in fatos:
         facts = facts + fat + "\n"
-    stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n    
-⌛️ {score_splt[1]}\n                                                         
-{stats_p}\n   
-⚠️ Fatos do jogo:\n'''
+    stats_now = f'''{score_splt[-4]}|{score_splt[-2]}|{score_splt[1]}|{stats_p}Fatos do jogo'''
     # {facts}
     return stats_now
 
@@ -207,105 +194,53 @@ async def normal_monit(pagina, score_splt, stats_p):
 
         for i in range(len(stats)):
             if stats[i] == "OPORTUNIDADES DE GOLO":
-                stats_p = stats_p + f'''
-❌🥅 Oportunidades de gol:\n
-{score_splt[0]} - {stats[i - 1]} 
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                stats_p = stats_p + f'''Oportunidades de gol:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "Remates":
-                stats_p = stats_p + f'''
-👟 Chutes totais:\n
-{score_splt[0]} - {stats[i - 1]} 
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                stats_p = stats_p + f'''Chutes totais:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "Remates Para Fora":
-                stats_p = stats_p + f'''
-👟❌🥅 Chutes para fora:\n
-{score_splt[0]} - {stats[i - 1]} 
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                stats_p = stats_p + f'''Chutes para fora:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "REMATES À BALIZA" or stats[i] == "Remates À Baliza":
                 if "Chutes ao gol" not in stats_p:
-                    stats_p = stats_p + f'''
-👟 🥅 Chutes ao gol:\n                                                         
-{score_splt[0]} - {stats[i - 1]}                                             
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                    stats_p = stats_p + f'''Chutes ao gol:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "Precisão Nas Finalizações":
-                stats_p = stats_p + f'''
-👟🎯🥅 Precisão nas finalizações:\n
-{score_splt[0]} - {stats[i - 1]}% 
-{score_splt[-1]} - {stats[i + 1]}%\n'''
+                stats_p = stats_p + f'''Precisão nas finalizações:|{stats[i - 1]}%|{stats[i + 1]}%|'''
 
             if stats[i] == "POSSE DE BOLA":
                 if stats[i - 1].isdigit() and stats[i + 1].isdigit():
-                    stats_p = stats_p + f'''
-⚽️ Posse de Bola:\n                                                                 
-{score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                    stats_p = stats_p + f'''Posse de Bola:|{stats[i - 1]}|{stats[i + 1]}|'''
                 else:
-                    stats_p = stats_p + f'''
-⚽️ Posse de Bola:\n                                                                 
-{score_splt[0]} - {stats[i - 2]}%                                                    
-{score_splt[-1]} - {stats[i + 2]}%\n'''
+                    stats_p = stats_p + f'''Posse de Bola:|{stats[i - 2]}%|{stats[i + 2]}%|'''
 
             if stats[i] == "ATAQUE PERIGOSO" or stats[i] == "Ataques Perigosos":
                 if stats[i - 1].isdigit():
-                    stats_p = stats_p + f'''
-🎯 Ataques Perigosos:\n                                                               
-{score_splt[0]} - {stats[i - 1]}                                                   
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                    stats_p = stats_p + f'''Ataques Perigosos:|{stats[i - 1]}|{stats[i + 1]}|'''
                 else:
-                    stats_p = stats_p + f'''
-🎯 Ataque Perigoso:\n                                                               
-{score_splt[0]} - {stats[i - 1]}                                                   
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                    stats_p = stats_p + f'''Ataque Perigoso:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "ATAQUE":
-                stats_p = stats_p + f'''
-🎯 Ataque:\n                                                                         
-{score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                stats_p = stats_p + f'''Ataque:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "BOLA SEGURA":
-                stats_p = stats_p + f'''
-⚽️ Bola Segura:\n                                                                         
-{score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                stats_p = stats_p + f'''Bola Segura:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "DEFESAS":
-                stats_p = stats_p + f'''
-🥅🎯 Defesas:\n                                                                         
-{score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                stats_p = stats_p + f'''Defesas:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "FORAS DE JOGO" or stats[i] == "Foras De Jogo":
-                stats_p = stats_p + f'''
-⛔️⚽️ Impedimentos:\n                                                                         
-{score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                stats_p = stats_p + f'''Impedimentos:|{stats[i - 1]}|{stats[i + 1]}|'''
 
             if stats[i] == "FALTAS" or stats[i] == "Faltas Cometidas":
-                stats_p = stats_p + f'''
-✖️⚽️ Faltas:\n                                                                         
-{score_splt[0]} - {stats[i - 1]}                                                    
-{score_splt[-1]} - {stats[i + 1]}\n'''
+                stats_p = stats_p + f'''Faltas:|{stats[i - 1]}|{stats[i + 1]}|'''
 
     if frame:
-        stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n        
-⌛️ {score_splt[1]}\n                                                         
-{stats_p}\n 
-⚠️ Fatos do jogo:\n                                                                                                                             
-'''
+        stats_now = f'''{score_splt[-4]}|{score_splt[-2]}|{score_splt[1]}|{stats_p}Fatos do jogo'''
         # {facts_frame}
     else:
-        stats_now = f'''\n
-⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n        
-⌛️ {score_splt[1]}\n                                                         
-{stats_p}\n 
-⚠️ Fatos do jogo:\n                                                                                                                              
-'''
+        stats_now = f'''{score_splt[-4]}|{score_splt[-2]}|{score_splt[1]}|{stats_p}Fatos do jogo'''
     # {facts_normal}
     return stats_now
 
@@ -374,6 +309,7 @@ async def promise(rotina, pagina, match):
 
                 print(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
                 logging.info(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
+                await Inter_csv.write_csv(casa,fora, stats_now)
                 await trigger(stats_now)
 
             else:
@@ -539,6 +475,10 @@ async def solo_queue(qtd_fut):
 
     if qtd_fut >= 16:
         await asyncio.gather(multi_pages(0), multi_pages(1), multi_pages(2), multi_pages(3))
+    elif qtd_fut >= 9:
+        await asyncio.gather(multi_pages(0), multi_pages(1), multi_pages(2))
+    elif qtd_fut >= 6:
+        await asyncio.gather(multi_pages(0), multi_pages(1))
     elif qtd_fut > 1:
         await asyncio.gather(multi_pages(0))
     else:
