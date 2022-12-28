@@ -71,7 +71,7 @@ async def initial_monit(pagina):
                 cantos_fora += 1
             logging.info(f"Peguei um escanteio nos incidentes: {inc}")
 
-    stats_p = stats_p + f'''Cartões Amarelos:|{amarelo_casa}|{amarelo_fora}|Cartões Vermelhos:|{red_casa}|{red_fora}|Escanteios:|{cantos_casa}|{cantos_fora}|'''
+    stats_p = stats_p + f'''Cartões Amarelos {score_splt[0]}:|{amarelo_casa}|Cartões Amarelos {score_splt[-1]}:|{amarelo_fora}|Cartões Vermelhos {score_splt[0]}:|{red_casa}|Cartões Vermelhos {score_splt[-1]}:|{red_fora}|Escanteios {score_splt[0]}:|{cantos_casa}|Escanteios {score_splt[-1]}:|{cantos_fora}|'''
 
     return score_splt, stats_p, incidents
 
@@ -194,47 +194,47 @@ async def normal_monit(pagina, score_splt, stats_p):
 
         for i in range(len(stats)):
             if stats[i] == "OPORTUNIDADES DE GOLO":
-                stats_p = stats_p + f'''Oportunidades de gol:|{stats[i - 1]}|{stats[i + 1]}|'''
+                stats_p = stats_p + f'''Oportunidades de gol {score_splt[0]}:|{stats[i - 1]}|Oportunidades de gol {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "Remates":
-                stats_p = stats_p + f'''Chutes totais:|{stats[i - 1]}|{stats[i + 1]}|'''
+                stats_p = stats_p + f'''Chutes totais {score_splt[0]}:|{stats[i - 1]}|Chutes totais {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "Remates Para Fora":
-                stats_p = stats_p + f'''Chutes para fora:|{stats[i - 1]}|{stats[i + 1]}|'''
+                stats_p = stats_p + f'''Chutes para fora {score_splt[0]}:|{stats[i - 1]}|Chutes para fora {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "REMATES À BALIZA" or stats[i] == "Remates À Baliza":
                 if "Chutes ao gol" not in stats_p:
-                    stats_p = stats_p + f'''Chutes ao gol:|{stats[i - 1]}|{stats[i + 1]}|'''
+                    stats_p = stats_p + f'''Chutes no alvo {score_splt[0]}:|{stats[i - 1]}|Chutes no alvo {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "Precisão Nas Finalizações":
-                stats_p = stats_p + f'''Precisão nas finalizações:|{stats[i - 1]}%|{stats[i + 1]}%|'''
+                stats_p = stats_p + f'''Precisão nas finalizações {score_splt[0]}:|{stats[i - 1]}|Precisão nas finalizações {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "POSSE DE BOLA":
                 if stats[i - 1].isdigit() and stats[i + 1].isdigit():
-                    stats_p = stats_p + f'''Posse de Bola:|{stats[i - 1]}|{stats[i + 1]}|'''
+                    stats_p = stats_p + f'''Posse de bola {score_splt[0]}:|{stats[i - 1]}|Posse de bola {score_splt[-1]}:|{stats[i + 1]}|'''
                 else:
-                    stats_p = stats_p + f'''Posse de Bola:|{stats[i - 2]}%|{stats[i + 2]}%|'''
+                    stats_p = stats_p + f'''Posse de bola {score_splt[0]}:|{stats[i - 1]}|Posse de bola {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "ATAQUE PERIGOSO" or stats[i] == "Ataques Perigosos":
                 if stats[i - 1].isdigit():
-                    stats_p = stats_p + f'''Ataques Perigosos:|{stats[i - 1]}|{stats[i + 1]}|'''
+                    stats_p = stats_p + f'''Ataques perigosos {score_splt[0]}:|{stats[i - 1]}|Ataques perigosos {score_splt[-1]}:|{stats[i + 1]}|'''
                 else:
-                    stats_p = stats_p + f'''Ataque Perigoso:|{stats[i - 1]}|{stats[i + 1]}|'''
+                    stats_p = stats_p + f'''Ataque perigoso {score_splt[0]}:|{stats[i - 1]}|Ataque perigoso {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "ATAQUE":
-                stats_p = stats_p + f'''Ataque:|{stats[i - 1]}|{stats[i + 1]}|'''
+                stats_p = stats_p + f'''Ataque {score_splt[0]}:|{stats[i - 1]}|Ataque {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "BOLA SEGURA":
-                stats_p = stats_p + f'''Bola Segura:|{stats[i - 1]}|{stats[i + 1]}|'''
+                stats_p = stats_p + f'''Bola segura {score_splt[0]}:|{stats[i - 1]}|Bola segura {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "DEFESAS":
-                stats_p = stats_p + f'''Defesas:|{stats[i - 1]}|{stats[i + 1]}|'''
+                stats_p = stats_p + f'''Defesas {score_splt[0]}:|{stats[i - 1]}|Defesas {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "FORAS DE JOGO" or stats[i] == "Foras De Jogo":
-                stats_p = stats_p + f'''Impedimentos:|{stats[i - 1]}|{stats[i + 1]}|'''
+                stats_p = stats_p + f'''Impedimentos {score_splt[0]}:|{stats[i - 1]}|Impedimentos {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "FALTAS" or stats[i] == "Faltas Cometidas":
-                stats_p = stats_p + f'''Faltas:|{stats[i - 1]}|{stats[i + 1]}|'''
+                stats_p = stats_p + f'''Faltas {score_splt[0]}:|{stats[i - 1]}|Faltas {score_splt[-1]}:|{stats[i + 1]}|'''
 
     if frame:
         stats_now = f'''{score_splt[-4]}|{score_splt[-2]}|{score_splt[1]}|{stats_p}Fatos do jogo'''
@@ -309,7 +309,7 @@ async def promise(rotina, pagina, match):
 
                 print(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
                 logging.info(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
-                await Inter_csv.write_csv(casa,fora, stats_now)
+                await Inter_csv.write_csv(casa, fora, stats_now)
                 await trigger(stats_now)
 
             else:
@@ -454,7 +454,7 @@ async def monitorar():
                     qtd_fut = int(qtd_fut.group())
                     await browser.close()
                     await solo_queue(qtd_fut)
-                    await asyncio.sleep(random.randrange(600, 1200))
+                    await asyncio.sleep(random.randrange(300, 600))
 
         except Exception as error:
             print(f"Deu merda, aqui o que foi: {error.__class__}")

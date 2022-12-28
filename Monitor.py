@@ -279,6 +279,7 @@ class Watcher:
                     amarelo_fora = 0
                     cantos_casa = 0
                     cantos_fora = 0
+                    expected = ""
 
                     t_inicial = time.time()
 
@@ -286,6 +287,13 @@ class Watcher:
                         await pagina.wait_for_selector(".scoreboard__top")
                         score = await pagina.locator(".scoreboard__top").inner_text()
                         score_splt = score.split("\n")
+
+                        try:
+                            expected = await pagina.locator(".scoreboard-summary__value").nth(3).inner_text()
+                        except Exception as error:
+                            print(f"Deu merda, aqui o que foi: {error.__class__}")
+                            print(error)
+                            print(format_tb(error.__traceback__))
 
                         if not alt_monit:
                             await pagina.wait_for_selector(".live-incidents__container__title")
@@ -306,10 +314,10 @@ class Watcher:
                         if not alt_monit:
                             await pagina.wait_for_selector(".control-button")
                             control = pagina.locator(".control-button")
-                            #print(await control.nth(4).inner_html())
-                            #print(await control.nth(3).inner_html())
-                            #print(await control.nth(2).inner_html())
-                            #print(await control.nth(1).get_attribute("name"))
+                            # print(await control.nth(4).inner_html())
+                            # print(await control.nth(3).inner_html())
+                            # print(await control.nth(2).inner_html())
+                            # print(await control.nth(1).get_attribute("name"))
                             btn_state = await control.nth(4).get_attribute("class")
                             if "active" not in btn_state:
                                 await control.nth(4).click()
@@ -716,7 +724,8 @@ class Watcher:
                             if len(fato_splt) > 1 and fato_splt[0] != "Início do segundo tempo":
                                 stats_now = f'''\n
 ⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
-⌛️ {score_splt[1]}\n                                                         
+⌛️ {score_splt[1]}\n  
+⚽️ Gols esperados: {expected}\n                                                       
 {stats_p}\n                                                                      
 ⚠️ Último Lance:\n                                                             
 ⌛️  {fato_splt[0]}\n                                                                                                     
@@ -725,7 +734,8 @@ class Watcher:
                             else:
                                 stats_now = f'''\n
 ⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
-⌛️ {score_splt[1]}\n                                                         
+⌛️ {score_splt[1]}\n 
+⚽️ Gols esperados: {expected}\n                                                        
 {stats_p}\n  
 ⚠️ Último Lance:\n
 ➕ {fato_splt[0]}\n  
@@ -735,7 +745,8 @@ class Watcher:
                             if len(fato_splt) > 1 and fato_splt[0] != "Início do segundo tempo":
                                 stats_now = f'''\n
 ⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
-⌛️ {score_splt[1]}\n                                                         
+⌛️ {score_splt[1]}\n  
+⚽️ Gols esperados: {expected}\n                                                       
 {stats_p}\n                                                                      
 ⚠️ Último Lance:\n                                                             
 ⌛️  {fato_splt[0]}\n                                                                                                     
@@ -745,7 +756,8 @@ class Watcher:
                             else:
                                 stats_now = f'''\n
 ⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
-⌛️ {score_splt[1]}\n                                                         
+⌛️ {score_splt[1]}\n   
+⚽️ Gols esperados: {expected}\n                                                      
 {stats_p}\n  
 ⚠️ Último Lance:\n
 ➕ {fato_splt[0]}\n  
@@ -760,7 +772,8 @@ class Watcher:
                             if len(fato_splt) > 2 and "segundo tempo" not in incidents[0]:
                                 stats_now = f'''\n
 ⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
-⌛️ {score_splt[1]}\n                                                         
+⌛️ {score_splt[1]}\n 
+⚽️ Gols esperados: {expected}\n                                                        
 {stats_p}\n                                                                      
 ⚠️ Último Lance:\n                                                             
 {fato_splt[2]}\n   
@@ -770,7 +783,8 @@ class Watcher:
                             else:
                                 stats_now = f'''\n
 ⚽️ {score_splt[0]} {score_splt[-4]} x {score_splt[-2]} {score_splt[-1]}\n       
-⌛️ {score_splt[1]}\n                                                         
+⌛️ {score_splt[1]}\n     
+⚽️ Gols esperados: {expected}\n                                                    
 {stats_p}\n                                                                      
 ⚠️ Último Lance:\n
 ➕ {incidents[0]}\n     
