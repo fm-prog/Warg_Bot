@@ -279,7 +279,7 @@ class Watcher:
                     amarelo_fora = 0
                     cantos_casa = 0
                     cantos_fora = 0
-                    expected = ""
+                    expected = " ⚠️ Indisponível!"
 
                     t_inicial = time.time()
 
@@ -289,11 +289,19 @@ class Watcher:
                         score_splt = score.split("\n")
 
                         try:
-                            expected = await pagina.locator(".scoreboard-summary__value").nth(3).inner_text()
+                            await pagina.wait_for_selector(".scoreboard-summary__item.expected-goal.swiper-slide.has-tooltip", timeout=2000)
+                            expected = await pagina.locator(".scoreboard-summary__item.expected-goal.swiper-slide.has-tooltip").inner_text()
+
                         except Exception as error:
-                            print(f"Deu merda, aqui o que foi: {error.__class__}")
-                            print(error)
-                            print(format_tb(error.__traceback__))
+                            if "Timeout" in str(error):
+                                print(f"Exception forçada com sucesso devido à ausência de XG!")
+                            else:
+                                print(f"Deu merda, aqui o que foi: {error.__class__}")
+                                print(error)
+                                print(format_tb(error.__traceback__))
+
+                        frames = pagina.frames
+                        print(f"Total de frames:{len(frames)}")
 
                         if not alt_monit:
                             await pagina.wait_for_selector(".live-incidents__container__title")
@@ -323,9 +331,6 @@ class Watcher:
                                 await control.nth(4).click()
                                 print("Ativei o Botao!")
                                 await asyncio.sleep(3)
-
-                            frames = pagina.frames
-                            print(f"Total de frames:{len(frames)}")
 
                             if len(frames) > 3:
                                 wab_f = True

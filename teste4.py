@@ -13,9 +13,10 @@ async def main():
     fora = "NK Varazdin"
     times = [casa, fora]
     tempo = ""
-    lista_dados = ['0', '0', '4:14', 'Cartões Amarelos US Lecce:', '0', 'Cartões Amarelos NK Varazdin:', '0',
-                   'Cartões Vermelhos US Lecce:', '0', 'Cartões Vermelhos NK Varazdin:', '0', 'Escanteios US Lecce:',
-                   '0', 'Escanteios NK Varazdin:', '0', 'Fatos do jogo']
+    lista_dados = ['1', '0', '20:14', 'Cartões Amarelos US Lecce:', '1', 'Cartões Amarelos NK Varazdin:', '0',
+                   'Cartões Vermelhos US Lecce:', '1', 'Cartões Vermelhos NK Varazdin:', '1', 'Escanteios US Lecce:',
+                   '0', 'Escanteios NK Varazdin:', '1', 'Posse de bola US Lecce:', '54', 'Posse de bola NK Varazdin:',
+                   '45', 'Fatos do jogo']
     print(lista_dados)
 
     try:
@@ -63,8 +64,9 @@ async def main():
                 # coluna = str(lista_dados[ind])
                 # tabela = tabela.append([{coluna: lista_dados[ind + 1]}])
 
-        print(lista_col, lista_data)
         df = pd.DataFrame([lista_data], columns=lista_col)
+        print(tabela)
+        print(df)
         tabela = tabela.append(df)
         path = Path(f'Dados Apostador/{casa} x {fora}.csv')
         path.parent.mkdir(parents=True, exist_ok=True)

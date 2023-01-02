@@ -2,7 +2,7 @@ import datetime
 import logging
 import asyncio
 from traceback import format_tb
-
+from Data_Aposta import Inter_csv as csv
 import aioschedule
 from telebot.async_telebot import AsyncTeleBot
 from telebot.async_telebot import types
@@ -69,6 +69,8 @@ async def responder(mensagem):
 ✅Exemplo: /torcer Bahia
 🫡 /set_saldo (valor) - Função para definir o saldo da Banca!
 ✅Exemplo: /set_saldo 100
+🫡 /rotinas - Função que mostra quais rotinas da função apostador que estão sendo executadas!!
+🫡 /rm_csv - Função que remove a pasta dos dados armazenados pela função Apostador!
 '''
     if len(str(texto)) > 4096:
         for x in range(0, len(str(texto)), 4096):
@@ -663,6 +665,19 @@ async def programar_sch(mensagem, time, hora):
         print(sch_programar.jobs)
 
         return aioschedule.CancelJob
+
+
+@bot.message_handler(commands=['rm_csv'])
+async def responder(mensagem):
+    """
+    Função que remove a pasta dos dados armazenados pela função Apostador!
+    """
+    if await csv.rem_csv():
+        await bot.reply_to(mensagem, f"<b>⚠️ Dados csv excluídos com sucesso!</b>", parse_mode="HTML")
+    else:
+        await bot.reply_to(mensagem,
+                           f"<b>❌ Operação falhou, o diretório que armazena os dados foi excluído ou alterado!</b>",
+                           parse_mode="HTML")
 
 
 @bot.message_handler(func=lambda message: True)

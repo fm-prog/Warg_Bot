@@ -28,9 +28,24 @@ async def initial_monit(pagina):
     cantos_casa = 0
     cantos_fora = 0
     stats_p = ""
+    expected = "Nan"
 
     score = await pagina.locator(".scoreboard__top").inner_text()
     score_splt = score.split("\n")
+
+    try:
+        await pagina.wait_for_selector(".scoreboard-summary__item.expected-goal.swiper-slide.has-tooltip", timeout=2000)
+        expected = await pagina.locator(".scoreboard-summary__item.expected-goal.swiper-slide.has-tooltip").inner_text()
+        expected = expected.split("-")
+
+    except Exception as error:
+        if "Timeout" in str(error):
+            print(f"Exception forçada com sucesso devido à ausência de XG!")
+        else:
+            print(f"Deu merda, aqui o que foi: {error.__class__}")
+            print(error)
+            print(format_tb(error.__traceback__))
+
     await pagina.wait_for_selector(".live-incidents__container__title")
     drop = pagina.locator(".live-incidents__container__title")
     await drop.click()
@@ -71,7 +86,13 @@ async def initial_monit(pagina):
                 cantos_fora += 1
             logging.info(f"Peguei um escanteio nos incidentes: {inc}")
 
-    stats_p = stats_p + f'''Cartões Amarelos {score_splt[0]}:|{amarelo_casa}|Cartões Amarelos {score_splt[-1]}:|{amarelo_fora}|Cartões Vermelhos {score_splt[0]}:|{red_casa}|Cartões Vermelhos {score_splt[-1]}:|{red_fora}|Escanteios {score_splt[0]}:|{cantos_casa}|Escanteios {score_splt[-1]}:|{cantos_fora}|'''
+    print(f"Esperado: {expected}")
+    if expected != "Nan":
+        print("Coloquei expected")
+        stats_p = stats_p + f'''Cartões Amarelos {score_splt[0]}:|{amarelo_casa}|Cartões Amarelos {score_splt[-1]}:|{amarelo_fora}|Cartões Vermelhos {score_splt[0]}:|{red_casa}|Cartões Vermelhos {score_splt[-1]}:|{red_fora}|Escanteios {score_splt[0]}:|{cantos_casa}|Escanteios {score_splt[-1]}:|{cantos_fora}|Estimativa de gols {score_splt[0]}:|{expected[0]}|Estimativa de gols {score_splt[-1]}:|{expected[1]}|'''
+    else:
+        print("Não Coloquei expected")
+        stats_p = stats_p + f'''Cartões Amarelos {score_splt[0]}:|{amarelo_casa}|Cartões Amarelos {score_splt[-1]}:|{amarelo_fora}|Cartões Vermelhos {score_splt[0]}:|{red_casa}|Cartões Vermelhos {score_splt[-1]}:|{red_fora}|Escanteios {score_splt[0]}:|{cantos_casa}|Escanteios {score_splt[-1]}:|{cantos_fora}|'''
 
     return score_splt, stats_p, incidents
 
@@ -210,10 +231,11 @@ async def normal_monit(pagina, score_splt, stats_p):
                 stats_p = stats_p + f'''Precisão nas finalizações {score_splt[0]}:|{stats[i - 1]}|Precisão nas finalizações {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "POSSE DE BOLA":
-                if stats[i - 1].isdigit() and stats[i + 1].isdigit():
+                if await Lib.is_percent(stats[i - 1]):
                     stats_p = stats_p + f'''Posse de bola {score_splt[0]}:|{stats[i - 1]}|Posse de bola {score_splt[-1]}:|{stats[i + 1]}|'''
                 else:
-                    stats_p = stats_p + f'''Posse de bola {score_splt[0]}:|{stats[i - 1]}|Posse de bola {score_splt[-1]}:|{stats[i + 1]}|'''
+                    pass
+                    # stats_p = stats_p + f'''Posse de bola {score_splt[0]}:|{stats[i - 1]}|Posse de bola {score_splt[-1]}:|{stats[i + 1]}|'''
 
             if stats[i] == "ATAQUE PERIGOSO" or stats[i] == "Ataques Perigosos":
                 if stats[i - 1].isdigit():
@@ -310,7 +332,6 @@ async def promise(rotina, pagina, match):
                 print(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
                 logging.info(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
                 await Inter_csv.write_csv(casa, fora, stats_now)
-                await trigger(stats_now)
 
             else:
                 print("Jogo simulação, passei!")
@@ -395,7 +416,7 @@ async def multi_pages(rotina):
 
                 task = promise(rotina, pagina, match)
                 try:
-                    await asyncio.wait_for(task, timeout=120)
+                    await asyncio.wait_for(task, timeout=60)
                 except asyncio.TimeoutError:
                     print(f"Demorou tempo demais, vou reiniciar a rotina se ainda tiverem itens na queue!")
                     logging.info("Demorou tempo demais, vou reiniciar a rotina se ainda tiverem itens na queue!")

@@ -4,6 +4,11 @@ from difflib import SequenceMatcher
 import logging
 
 
+async def is_percent(string):
+    reg_exp = r"[0-100] %"
+    return re.match(reg_exp, string)
+
+
 async def is_agendar(string):
     if string.isdigit():
         reg_exp = r"[1-999]"
