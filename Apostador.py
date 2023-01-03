@@ -86,12 +86,11 @@ async def initial_monit(pagina):
                 cantos_fora += 1
             logging.info(f"Peguei um escanteio nos incidentes: {inc}")
 
-    print(f"Esperado: {expected}")
     if expected != "Nan":
-        print("Coloquei expected")
+        print("Coloquei XG")
         stats_p = stats_p + f'''Cartões Amarelos {score_splt[0]}:|{amarelo_casa}|Cartões Amarelos {score_splt[-1]}:|{amarelo_fora}|Cartões Vermelhos {score_splt[0]}:|{red_casa}|Cartões Vermelhos {score_splt[-1]}:|{red_fora}|Escanteios {score_splt[0]}:|{cantos_casa}|Escanteios {score_splt[-1]}:|{cantos_fora}|Estimativa de gols {score_splt[0]}:|{expected[0]}|Estimativa de gols {score_splt[-1]}:|{expected[1]}|'''
     else:
-        print("Não Coloquei expected")
+        print("Não Coloquei XG")
         stats_p = stats_p + f'''Cartões Amarelos {score_splt[0]}:|{amarelo_casa}|Cartões Amarelos {score_splt[-1]}:|{amarelo_fora}|Cartões Vermelhos {score_splt[0]}:|{red_casa}|Cartões Vermelhos {score_splt[-1]}:|{red_fora}|Escanteios {score_splt[0]}:|{cantos_casa}|Escanteios {score_splt[-1]}:|{cantos_fora}|'''
 
     return score_splt, stats_p, incidents
@@ -272,11 +271,11 @@ async def promise(rotina, pagina, match):
     try:
         print(f"Ainda na soloq:{soloq_jogos.qsize()}")
         logging.info(f"Ainda na soloq:{soloq_jogos.qsize()}")
-        print(f"Observador {rotina + 1} no jogo de número {jogo}!")
-        Observers[rotina] = f"Observador {rotina + 1} no jogo de número {jogo}!"
+        print(f"Rotina {rotina + 1} no jogo de número {jogo}!")
+        Observers[rotina] = f"Rotina {rotina + 1} no jogo de número {jogo}!"
         print(Observers)
-        logging.info(f"lista dos observadores: {Observers}")
-        logging.info(f"Observador {rotina + 1} no jogo de número {jogo}!")
+        logging.info(f"lista das rotinas: {Observers}")
+        logging.info(f"Rotina {rotina + 1} no jogo de número {jogo}!")
         await match.nth(jogo).hover()
         await match.nth(jogo).click()
         await asyncio.sleep(1)
@@ -327,10 +326,11 @@ async def promise(rotina, pagina, match):
                     stats_now = await alt_monit(score_splt, stats_p, fatos_drop)
 
                 if not ativo:
+                    logging.info("Motor da função apostador interrompido pelo usuário!")
                     return await trigger("Motor da função apostador interrompido pelo usuário!")
 
-                print(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
-                logging.info(f"Observador {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
+                print(f"Rotina {rotina + 1} no jogo de número {jogo} terminou sua tarefa!")
+                logging.info(f"Rotina {rotina + 1} no jogo de número {jogo}, terminou sua tarefa!")
                 await Inter_csv.write_csv(casa, fora, stats_now)
 
             else:
@@ -350,7 +350,7 @@ Deu merda, aqui no try da soloq_jogos, erro de range: {error.__class__}\n
 {error}\n
 {format_tb(error.__traceback__)}\n
 '''
-        print(f"Observador {rotina + 1} no jogo de número {jogo}, pulou a tarefa devido a um erro!")
+        print(f"Rotina {rotina + 1} no jogo de número {jogo}, pulou a tarefa devido a um erro!")
         logging.error(info)
 
     except Exception as error:
@@ -363,10 +363,11 @@ Deu merda, aqui no try da soloq_jogos, o que foi: {error.__class__}\n
 {format_tb(error.__traceback__)}\n
 '''
         logging.error(info)
+        print(f"Rotina {rotina + 1} no jogo de número {jogo}, pulou a tarefa devido a um erro!")
 
     Observers[rotina] = "Stand By"
-    logging.info(f"Observador {rotina + 1} terminou todas as atividades!")
-    return print(f"Observador {rotina + 1} terminou todas as atividades!")
+    logging.info(f"Rotina {rotina + 1} terminou todas as atividades!")
+    return print(f"Rotina {rotina + 1} terminou todas as atividades!")
 
 
 async def multi_pages(rotina):
@@ -507,6 +508,8 @@ async def solo_queue(qtd_fut):
 
     print("Rodada de monitoramento concluída!")
     logging.info("Rodada de monitoramento concluída!")
+    await Inter_csv.check_csv()
+    Inter_csv.observados.clear()
 
 
 async def trigger(info):

@@ -5,9 +5,17 @@ from playwright.async_api import async_playwright
 from pathlib import Path
 import os
 
+observados = ['Francana Sub-20 x Guarani-SP Sub-20.csv', 'Queens Park Rangers x Sheffield United.csv']
+
 
 async def main():
-    os.system(r"attrib +s +h 'C:\Users\Hardwell\PycharmProjects\Play_right\Dados Apostador'")
+    p = Path('Dados Apostador')
+    if p.exists():
+        for child in p.iterdir():
+            if child.name in observados:
+                print(child.name)
+            # child.unlink()
+        #p.rmdir()
 
     # icon = stats.locator(".icon")
     # print(await cw.count())

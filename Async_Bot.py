@@ -318,7 +318,7 @@ async def responder(msg):
             if i != "Stand By":
                 await bot.send_message(msg.chat.id, f"<b>👁‍🗨 {i}</b>", parse_mode="HTML")
             else:
-                desocup += f"<b>👁‍🗨 O Observador {t + 1} está desocupado!\n</b>"
+                desocup += f"<b>👁‍🗨 A rotina {t + 1} está desocupada!\n</b>"
 
         if desocup != "":
             await bot.send_chat_action(msg.chat.id, 'typing')
@@ -572,7 +572,7 @@ async def responder(mensagem):
             await bot.send_sticker(mensagem.chat.id,
                                    "CAACAgIAAxkBAAEG20RjnN6d6qGFm7aIG2bDAoToOirNMwACmwIAAzigCnIiKYAfnhYoLAQ")
             await bot.reply_to(mensagem,
-                               "<b>⚠️ Sucesso, vou gestionar a banca e mandar dicas de apostas pra tú, segue as calls, (ou não) 😂😂😂!</b>",
+                               "<b>⚠️ Sucesso, vou gestionar a banca e mandar dicas de apostas pra tú, segue as calls! Ou não! 😂😂😂!</b>",
                                parse_mode="HTML")
             Apostador.ativo = True
             sch_apostador.every(2).seconds.do(atualizacao_apostador, msg=mensagem)

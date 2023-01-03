@@ -5,6 +5,17 @@ from pathlib import Path
 
 
 class Inter_csv:
+    observados = []
+
+    @staticmethod
+    async def check_csv():
+        p = Path('Dados Apostador')
+        if p.exists():
+            for child in p.iterdir():
+                if child.name in Inter_csv.observados:
+                    pass
+                else:
+                    child.unlink()
 
     @staticmethod
     async def rem_csv():
@@ -24,6 +35,8 @@ class Inter_csv:
         lista_dados = dados
         lista_dados = lista_dados.split("|")
         print(dados)
+
+        Inter_csv.observados.append(f"{casa} x {fora}.csv")
 
         if Path(f'Dados Apostador/{casa} x {fora}.csv').exists():
             path = Path(f'Dados Apostador/{casa} x {fora}.csv')
