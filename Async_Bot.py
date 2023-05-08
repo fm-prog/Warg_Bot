@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.DEBUG, filename="Bot.log", format="%(asctime)s
 logger = logging.getLogger('TeleBot')
 logger.setLevel(logging.DEBUG)
 
-token = '5638118272:AAH4v1fgYs9twpCjCmrMo08FMvT2KMolzWk'
+token = ''
 bot = AsyncTeleBot(token)
 markup = types.ForceReply(selective=False)
 
